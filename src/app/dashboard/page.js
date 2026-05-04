@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getDashboardData } from "@/lib/content-store";
 import { cn } from "@/lib/utils";
 
-const ICONS = [Building2, Briefcase, FileText, MessageSquare, Calendar];
+const ICONS = [Building2, Briefcase, MessageSquare, Calendar];
 
 export default async function DashboardPage() {
   const { stats, quickActions, recentMessages } = await getDashboardData();
@@ -17,17 +17,20 @@ export default async function DashboardPage() {
           const Icon = ICONS[index] ?? Building2;
 
           return (
-            <Card key={stat.title} className="border-border-subtle/50 shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-text-secondary">{stat.title}</CardTitle>
-                <div className="rounded-lg bg-surface-alt p-2">
-                  <Icon className="h-5 w-5 text-accent-deep-blue" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-display font-bold text-on-surface">{stat.value}</div>
-                <p className="mt-1 text-xs text-text-secondary">{stat.trend}</p>
-              </CardContent>
+            <Card key={stat.title} className="group border-border-subtle/50 shadow-sm overflow-hidden hover:border-secondary-fixed hover:shadow-architectural transition-all duration-300">
+              <Link href={stat.href || "#"}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-secondary-fixed transition-colors group-hover:bg-secondary-fixed-dim">
+                      <Icon size={20} className="text-on-secondary-fixed-variant" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-md font-medium text-text-secondary group-hover:text-on-surface transition-colors">{stat.title}</p>
+                      <div className="text-xl font-display font-bold text-on-surface">{stat.value}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Link>
             </Card>
           );
         })}

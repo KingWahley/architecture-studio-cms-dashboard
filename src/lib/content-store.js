@@ -310,7 +310,7 @@ export async function getDashboardData() {
       href: "/vacancies",
     },
     {
-      title: "Unread Messages",
+      title: "New Messages",
       value: messages.filter((item) => item.status === "new").length,
       trend: `${messages.length} messages tracked`,
       href: "/messages",
