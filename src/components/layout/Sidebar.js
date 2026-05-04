@@ -41,7 +41,7 @@ export default function Sidebar() {
       <div className="flex h-16 items-center justify-between px-4 border-b border-border-subtle">
         {!isCollapsed && (
           <span className="font-display font-bold text-lg text-accent-deep-blue whitespace-nowrap overflow-hidden">
-            Studio CMS
+             Pieach Studio
           </span>
         )}
         <button
