@@ -25,7 +25,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      
+      <section className="rounded-[2rem] border border-accent-deep-blue/10 bg-[linear-gradient(135deg,rgba(27,54,93,0.08),rgba(197,160,89,0.14),rgba(255,255,255,0.95))] p-8 shadow-architectural">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 self-start rounded-full bg-accent-deep-blue px-5 py-3 text-sm font-medium text-white transition hover:bg-accent-deep-blue/90"
+          >
+            Open content workspace
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
 
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat, index) => {
