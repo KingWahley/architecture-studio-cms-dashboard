@@ -1,99 +1,128 @@
 import Link from "next/link";
-import { ArrowRight, Briefcase, Building2, Calendar, FileText, MessageSquare } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, Calendar, FileText, MessageSquare, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { getDashboardData } from "@/lib/content-store";
+import { cn } from "@/lib/utils";
 
 const ICONS = [Building2, Briefcase, FileText, MessageSquare, Calendar];
 
-function formatTime(value) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Recently updated";
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-}
-
 export default async function DashboardPage() {
-  const { stats, activity, quickActions } = await getDashboardData();
+  const { stats, quickActions, recentMessages } = await getDashboardData();
 
   return (
     <div className="space-y-8">
-      
-
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
+      {/* Stats Overview */}
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = ICONS[index] ?? Building2;
 
           return (
-            <Card key={stat.title}>
+            <Card key={stat.title} className="border-border-subtle/50 shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-text-secondary">{stat.title}</CardTitle>
-                <Icon className="h-5 w-5 text-accent-muted-gold" />
+                <div className="rounded-lg bg-surface-alt p-2">
+                  <Icon className="h-5 w-5 text-accent-deep-blue" />
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-display font-bold text-on-surface">{stat.value}</div>
-                <p className="mt-2 text-xs text-text-secondary">{stat.trend}</p>
-                <Link href={stat.href} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent-deep-blue">
-                  Open section
-                  <ArrowRight size={14} />
-                </Link>
+                <p className="mt-1 text-xs text-text-secondary">{stat.trend}</p>
               </CardContent>
             </Card>
           );
         })}
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Fresh updates from the content collections.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {activity.map((item) => (
-              <div key={`${item.entityKey}-${item.target}-${item.time}`} className="flex items-start gap-4 border-b border-border-subtle pb-4 last:border-0 last:pb-0">
-                <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-accent-deep-blue" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-on-surface">{item.action}</p>
-                  <p className="text-xs text-text-secondary">
-                    {item.target} • {item.label} • {formatTime(item.time)}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+      {/* Main Content Split View */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+        {/* Left: Quick Actions (Narrow) */}
+        <section className="lg:col-span-4">
+          <Card className="h-full border-border-subtle/50 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.label}
+                  href={action.href}
+                  className="group flex items-center gap-4 rounded-xl border border-border-subtle bg-white p-4 transition-all hover:border-accent-deep-blue hover:shadow-architectural"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-alt transition-colors group-hover:border-accent-deep-blue/20 group-hover:bg-accent-deep-blue/5">
+                    <Plus size={18} className="text-text-secondary group-hover:text-accent-deep-blue" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-on-surface">{action.label}</p>
+                    <p className="truncate text-xs text-text-secondary">{action.helper}</p>
+                  </div>
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
+        </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Jump straight into the most common editor flows.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {quickActions.map((action) => (
-              <Link
-                key={action.label}
-                href={action.href}
-                className="group rounded-2xl border border-border-subtle bg-surface-alt p-5 transition hover:border-accent-deep-blue hover:bg-white"
+        {/* Right: Recent Messages (Wide) */}
+        <section className="lg:col-span-8">
+          <Card className="h-full border-border-subtle/50 shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg">Recent Messages</CardTitle>
+              <Link 
+                href="/messages" 
+                className="text-xs font-semibold uppercase tracking-wider text-accent-deep-blue hover:underline"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent-muted-gold">{action.helper}</p>
-                <p className="mt-3 text-lg font-display font-semibold text-on-surface">{action.label}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent-deep-blue">
-                  Open editor
-                  <ArrowRight size={14} className="transition group-hover:translate-x-1" />
-                </span>
+                View All Messages
               </Link>
-            ))}
-          </CardContent>
-        </Card>
-      </section>
+            </CardHeader>
+            <CardContent>
+              <div className="relative space-y-8 before:absolute before:left-2 before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-border-subtle/50">
+                {recentMessages.map((msg, idx) => (
+                  <div key={msg.id} className="relative pl-8">
+                    {/* Timeline Dot */}
+                    <div className={cn(
+                      "absolute left-0 top-1.5 h-4 w-4 rounded-full border-4 border-white shadow-sm transition-colors",
+                      idx === 0 ? "bg-status-active" : "bg-accent-muted-gold"
+                    )} />
+                    
+                    <div className="group flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-display text-base font-semibold text-on-surface group-hover:text-accent-deep-blue transition-colors">
+                          {msg.subject || `Message from ${msg.name}`}
+                        </p>
+                        <span className="rounded-md bg-surface-alt px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                          {msg.status}
+                        </span>
+                      </div>
+                      
+                      <p className="line-clamp-2 text-sm leading-relaxed text-text-secondary">
+                        {msg.message}
+                      </p>
+                      
+                      <div className="mt-2 flex items-center gap-4 text-xs text-text-secondary/70">
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-5 w-5 rounded-full bg-surface-alt flex items-center justify-center text-[10px] font-bold text-accent-deep-blue">
+                            {msg.name.charAt(0)}
+                          </div>
+                          <span>{msg.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Calendar size={12} />
+                          <span>{new Date(msg.updatedAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {recentMessages.length === 0 && (
+                  <div className="py-12 text-center">
+                    <p className="text-sm text-text-secondary">No recent messages to display.</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
     </div>
   );
 }

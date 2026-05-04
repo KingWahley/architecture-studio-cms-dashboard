@@ -9,11 +9,9 @@ import {
   FolderKanban, 
   Users, 
   Briefcase, 
-  FileText, 
   MessageSquare, 
   Calendar, 
   BookOpen, 
-  Image as ImageIcon,
   Settings,
   ChevronLeft,
   ChevronRight
@@ -25,11 +23,9 @@ const NAV_ITEMS = [
   { name: "Projects", href: "/projects", icon: FolderKanban },
   { name: "Team", href: "/team", icon: Users },
   { name: "Vacancies", href: "/vacancies", icon: Briefcase },
-  { name: "Job Applications", href: "/applications", icon: FileText },
   { name: "Messages", href: "/messages", icon: MessageSquare },
   { name: "Appointments", href: "/appointments", icon: Calendar },
   { name: "Blog Posts", href: "/blog", icon: BookOpen },
-  { name: "Media Library", href: "/media", icon: ImageIcon },
 ];
 
 export default function Sidebar() {

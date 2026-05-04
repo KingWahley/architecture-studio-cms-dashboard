@@ -3,10 +3,8 @@ export const ENTITY_ORDER = [
   "vacancies",
   "blog",
   "team",
-  "applications",
   "appointments",
   "messages",
-  "media",
 ];
 
 export const ENTITY_CONFIGS = {
@@ -22,7 +20,13 @@ export const ENTITY_CONFIGS = {
     statusField: "status",
     fields: [
       { name: "title", label: "Project title", type: "text", required: true },
-      { name: "category", label: "Category", type: "text", required: true },
+      {
+        name: "category",
+        label: "Category",
+        type: "select",
+        required: true,
+        options: ["Residential", "Commercial", "Industrial"],
+      },
       { name: "location", label: "Location", type: "text", required: true },
       { name: "year", label: "Year", type: "text", required: true },
       {
@@ -30,10 +34,13 @@ export const ENTITY_CONFIGS = {
         label: "Status",
         type: "select",
         required: true,
-        options: ["active", "ongoing", "completed", "draft"],
+        options: ["Draft", "Ongoing Construction", "Completed", "Published"],
       },
       { name: "image", label: "Cover image URL", type: "text" },
       { name: "summary", label: "Summary", type: "textarea" },
+      { name: "coordinates", label: "Map Coordinates", type: "text" },
+      { name: "publicVisibility", label: "Public Visibility", type: "boolean" },
+      { name: "gallery", label: "Gallery", type: "json" },
     ],
   },
   vacancies: {
@@ -69,7 +76,7 @@ export const ENTITY_CONFIGS = {
     singular: "Blog post",
     description: "Publish articles, insights, announcements, and editorial content.",
     titleField: "title",
-    descriptionField: "excerpt",
+    descriptionField: "Title ",
     metaFields: ["author", "date"],
     statusField: "status",
     fields: [
@@ -84,7 +91,7 @@ export const ENTITY_CONFIGS = {
         options: ["active", "draft", "completed"],
       },
       { name: "image", label: "Cover image URL", type: "text" },
-      { name: "excerpt", label: "Excerpt", type: "textarea" },
+      { name: "Title ", label: "Title ", type: "textarea" },
       { name: "body", label: "Body", type: "textarea" },
     ],
   },
@@ -113,31 +120,6 @@ export const ENTITY_CONFIGS = {
       { name: "bio", label: "Bio", type: "textarea" },
     ],
   },
-  applications: {
-    key: "applications",
-    route: "/applications",
-    label: "Applications",
-    singular: "Application",
-    description: "Track applicants, roles, and review progress in one place.",
-    titleField: "name",
-    descriptionField: "notes",
-    metaFields: ["role", "email", "date"],
-    statusField: "status",
-    fields: [
-      { name: "name", label: "Applicant name", type: "text", required: true },
-      { name: "email", label: "Email", type: "text", required: true },
-      { name: "role", label: "Role applied for", type: "text", required: true },
-      { name: "date", label: "Application date", type: "text", required: true },
-      {
-        name: "status",
-        label: "Status",
-        type: "select",
-        required: true,
-        options: ["new", "ongoing", "completed", "draft"],
-      },
-      { name: "notes", label: "Notes", type: "textarea" },
-    ],
-  },
   appointments: {
     key: "appointments",
     route: "/appointments",
@@ -148,6 +130,7 @@ export const ENTITY_CONFIGS = {
     descriptionField: "topic",
     metaFields: ["date", "time", "location"],
     statusField: "status",
+    readOnly: true,
     fields: [
       { name: "client", label: "Client", type: "text", required: true },
       { name: "topic", label: "Topic", type: "text", required: true },
@@ -174,6 +157,7 @@ export const ENTITY_CONFIGS = {
     descriptionField: "body",
     metaFields: ["name", "email", "date"],
     statusField: "status",
+    readOnly: true,
     fields: [
       { name: "name", label: "Sender name", type: "text", required: true },
       { name: "email", label: "Sender email", type: "text", required: true },
@@ -188,36 +172,6 @@ export const ENTITY_CONFIGS = {
       },
       { name: "preview", label: "Preview text", type: "textarea" },
       { name: "body", label: "Message body", type: "textarea" },
-    ],
-  },
-  media: {
-    key: "media",
-    route: "/media",
-    label: "Media Library",
-    singular: "Media item",
-    description: "Organize visual assets, folders, documents, and references.",
-    titleField: "name",
-    descriptionField: "description",
-    metaFields: ["type", "status", "url"],
-    statusField: "status",
-    fields: [
-      { name: "name", label: "Asset name", type: "text", required: true },
-      {
-        name: "type",
-        label: "Type",
-        type: "select",
-        required: true,
-        options: ["image", "folder", "document"],
-      },
-      {
-        name: "status",
-        label: "Status",
-        type: "select",
-        required: true,
-        options: ["active", "draft", "completed"],
-      },
-      { name: "url", label: "Asset URL", type: "text" },
-      { name: "description", label: "Description", type: "textarea" },
     ],
   },
 };

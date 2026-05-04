@@ -85,7 +85,7 @@ const DEFAULT_CONTENT = {
       date: "Oct 24, 2025",
       status: "active",
       image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=2065&auto=format&fit=crop",
-      excerpt: "A practical look at climate-aware materials, local context, and commercial viability.",
+      Title : "A practical look at climate-aware materials, local context, and commercial viability.",
       body: "A practical look at climate-aware materials, local context, and commercial viability.",
       updatedAt: "2026-04-27T13:30:00.000Z",
     },
@@ -96,7 +96,7 @@ const DEFAULT_CONTENT = {
       date: "Oct 12, 2025",
       status: "active",
       image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop",
-      excerpt: "How restrained material palettes and spatial discipline improve client experience.",
+      Title : "How restrained material palettes and spatial discipline improve client experience.",
       body: "How restrained material palettes and spatial discipline improve client experience.",
       updatedAt: "2026-04-20T16:20:00.000Z",
     },
@@ -107,7 +107,7 @@ const DEFAULT_CONTENT = {
       date: "Draft",
       status: "draft",
       image: "https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=2070&auto=format&fit=crop",
-      excerpt: "A draft feature on automation, comfort, and long-term maintainability at home.",
+      Title : "A draft feature on automation, comfort, and long-term maintainability at home.",
       body: "A draft feature on automation, comfort, and long-term maintainability at home.",
       updatedAt: "2026-04-15T07:50:00.000Z",
     },
@@ -142,38 +142,6 @@ const DEFAULT_CONTENT = {
       status: "ongoing",
       bio: "Coordinates delivery milestones, reporting, and cross-functional execution.",
       updatedAt: "2026-04-21T14:00:00.000Z",
-    },
-  ],
-  applications: [
-    {
-      id: "application-1",
-      name: "David Olatunji",
-      email: "david.o@example.com",
-      role: "Senior Architect",
-      date: "Oct 24, 2025",
-      status: "new",
-      notes: "Resume received and portfolio review pending.",
-      updatedAt: "2026-04-30T10:20:00.000Z",
-    },
-    {
-      id: "application-2",
-      name: "Sarah Meyer",
-      email: "smeyer@example.com",
-      role: "Interior Designer",
-      date: "Oct 22, 2025",
-      status: "completed",
-      notes: "Interview complete and feedback shared with hiring team.",
-      updatedAt: "2026-04-23T13:40:00.000Z",
-    },
-    {
-      id: "application-3",
-      name: "Ibrahim Musa",
-      email: "ibrahim99@example.com",
-      role: "Project Manager",
-      date: "Oct 20, 2025",
-      status: "ongoing",
-      notes: "Shortlisted for second-round conversation.",
-      updatedAt: "2026-04-19T08:05:00.000Z",
     },
   ],
   appointments: [
@@ -222,35 +190,6 @@ const DEFAULT_CONTENT = {
       preview: "We are an interior design firm looking to collaborate on your upcoming residential development.",
       body: "We are an interior design firm looking to collaborate on your upcoming residential development.",
       updatedAt: "2026-04-29T12:15:00.000Z",
-    },
-  ],
-  media: [
-    {
-      id: "media-1",
-      name: "Project Renders",
-      type: "folder",
-      status: "active",
-      url: "",
-      description: "Folder for approved renders and visual storytelling assets.",
-      updatedAt: "2026-04-28T11:11:00.000Z",
-    },
-    {
-      id: "media-2",
-      name: "marina-tower-ext.jpg",
-      type: "image",
-      status: "active",
-      url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
-      description: "Exterior hero shot for the Marina Towers case study.",
-      updatedAt: "2026-04-27T15:01:00.000Z",
-    },
-    {
-      id: "media-3",
-      name: "ikoyi-interior.jpg",
-      type: "image",
-      status: "draft",
-      url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
-      description: "Interior visual under review for residential portfolio updates.",
-      updatedAt: "2026-04-22T09:41:00.000Z",
     },
   ],
 };
@@ -354,7 +293,6 @@ export async function getDashboardData() {
   const content = await readContent();
   const projects = content.projects ?? [];
   const vacancies = content.vacancies ?? [];
-  const applications = content.applications ?? [];
   const messages = content.messages ?? [];
   const appointments = content.appointments ?? [];
 
@@ -370,12 +308,6 @@ export async function getDashboardData() {
       value: vacancies.filter((item) => item.status === "active").length,
       trend: `${vacancies.length} roles in the pipeline`,
       href: "/vacancies",
-    },
-    {
-      title: "Applications",
-      value: applications.length,
-      trend: `${applications.filter((item) => item.status === "new").length} need review`,
-      href: "/applications",
     },
     {
       title: "Unread Messages",
@@ -404,11 +336,18 @@ export async function getDashboardData() {
     .sort((left, right) => new Date(right.time).getTime() - new Date(left.time).getTime())
     .slice(0, 6);
 
-  const quickActions = ENTITY_ORDER.slice(0, 6).map((entityKey) => ({
-    label: `New ${ENTITY_CONFIGS[entityKey].singular}`,
-    href: ENTITY_CONFIGS[entityKey].route,
-    helper: ENTITY_CONFIGS[entityKey].label,
-  }));
+  const quickActions = ENTITY_ORDER
+    .filter((key) => !ENTITY_CONFIGS[key].readOnly)
+    .slice(0, 6)
+    .map((entityKey) => ({
+      label: `New ${ENTITY_CONFIGS[entityKey].singular}`,
+      href: ENTITY_CONFIGS[entityKey].route,
+      helper: ENTITY_CONFIGS[entityKey].label,
+    }));
 
-  return { stats, activity, quickActions };
+  const recentMessages = messages
+    .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
+    .slice(0, 5);
+
+  return { stats, activity, quickActions, recentMessages };
 }
