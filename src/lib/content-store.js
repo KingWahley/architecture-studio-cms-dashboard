@@ -352,5 +352,15 @@ export async function getDashboardData() {
     .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
     .slice(0, 5);
 
-  return { stats, activity, quickActions, recentMessages };
+  const upcomingAppointments = appointments
+    .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
+    .slice(0, 4);
+
+  return {
+    stats,
+    activity,
+    quickActions,
+    recentMessages,
+    upcomingAppointments,
+  };
 }

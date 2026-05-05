@@ -127,11 +127,14 @@ export default function SettingsPanel() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-3">
-        
+        <div className="inline-flex w-fit items-center gap-2 rounded-full border border-accent-deep-blue/15 bg-accent-deep-blue/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-accent-deep-blue">
+          <ShieldCheck size={14} />
+          Workspace Settings
+        </div>
         <div>
           <h1 className="font-display text-3xl font-semibold text-on-surface">Settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
-            Control your dashboard appearance and update dashboard password here
+            Control your dashboard appearance and secure access from one place.
           </p>
         </div>
       </div>
@@ -260,7 +263,7 @@ export default function SettingsPanel() {
                 />
               </div>
 
-              
+             
 
               {passwordState.message ? (
                 <div

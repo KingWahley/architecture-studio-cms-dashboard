@@ -131,7 +131,7 @@ export default function SettingsPanel() {
         <div>
           <h1 className="font-display text-3xl font-semibold text-on-surface">Settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-text-secondary">
-            Control your dashboard appearance and update dashboard password here
+            Control your dashboard appearance and 
           </p>
         </div>
       </div>
@@ -260,7 +260,7 @@ export default function SettingsPanel() {
                 />
               </div>
 
-              
+             
 
               {passwordState.message ? (
                 <div
