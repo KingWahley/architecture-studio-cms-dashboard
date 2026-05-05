@@ -62,7 +62,7 @@ export default function ProjectEditor({ project, config }) {
   return (
     <div className="flex flex-col min-h-screen bg-surface-alt/30">
       {/* Top Header */}
-      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-border-subtle px-6 py-4">
+      <header className="sticky top-0 z-30 bg-surface-main/85 backdrop-blur-md border-b border-border-subtle px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <div className="flex flex-col">
             <nav className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-text-secondary uppercase mb-1">
@@ -92,7 +92,7 @@ export default function ProjectEditor({ project, config }) {
           {/* Left Column */}
           <div className="space-y-8">
             {/* Project Information */}
-            <Card className="border-none shadow-architectural-sm bg-white overflow-hidden">
+            <Card className="border-none shadow-architectural-sm bg-surface-main overflow-hidden">
               <CardHeader className="border-b border-border-subtle/50 pb-4">
                 <CardTitle className="text-lg font-display">Project Information</CardTitle>
                 <CardDescription>Core details that define the project scope and identity.</CardDescription>
@@ -145,7 +145,7 @@ export default function ProjectEditor({ project, config }) {
             </Card>
 
             {/* Project Gallery */}
-            <Card className="border-none shadow-architectural-sm bg-white overflow-hidden">
+            <Card className="border-none shadow-architectural-sm bg-surface-main overflow-hidden">
               <CardHeader className="border-b border-border-subtle/50 pb-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -167,7 +167,7 @@ export default function ProjectEditor({ project, config }) {
                     >
                       <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <button className="p-2 bg-white/20 hover:bg-white/40 rounded-full backdrop-blur-md text-white transition-all">
+                        <button className="p-2 bg-surface-main/20 hover:bg-surface-main/40 rounded-full backdrop-blur-md text-white transition-all">
                           <Eye size={16} />
                         </button>
                         <button className="p-2 bg-white/20 hover:bg-error/80 rounded-full backdrop-blur-md text-white transition-all">
@@ -178,7 +178,7 @@ export default function ProjectEditor({ project, config }) {
                   ))}
                   
                   <div className="aspect-square border-2 border-dashed border-border-subtle rounded-xl bg-surface-alt/30 hover:bg-surface-alt/50 hover:border-accent-deep-blue/40 transition-all cursor-pointer flex flex-col items-center justify-center p-6 text-center group">
-                    <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-text-secondary group-hover:text-accent-deep-blue transition-colors mb-3">
+                    <div className="w-10 h-10 rounded-full bg-surface-main shadow-sm flex items-center justify-center text-text-secondary group-hover:text-accent-deep-blue transition-colors mb-3">
                       <CloudUpload size={20} />
                     </div>
                     <p className="text-xs font-bold text-on-surface mb-1">Upload More</p>
@@ -192,7 +192,7 @@ export default function ProjectEditor({ project, config }) {
           {/* Right Column (Sidebar) */}
           <div className="space-y-8">
             {/* Classification */}
-            <Card className="border-none shadow-architectural-sm bg-white overflow-hidden">
+            <Card className="border-none shadow-architectural-sm bg-surface-main overflow-hidden">
               <CardHeader className="border-b border-border-subtle/50 pb-4">
                 <CardTitle className="text-lg font-display">Classification</CardTitle>
               </CardHeader>
@@ -234,7 +234,7 @@ export default function ProjectEditor({ project, config }) {
             </Card>
 
             {/* Map Reference */}
-            <Card className="border-none shadow-architectural-sm bg-white overflow-hidden">
+            <Card className="border-none shadow-architectural-sm bg-surface-main overflow-hidden">
               <CardHeader className="border-b border-border-subtle/50 pb-4">
                 <CardTitle className="text-lg font-display">Map Reference</CardTitle>
               </CardHeader>
@@ -283,7 +283,7 @@ export default function ProjectEditor({ project, config }) {
                     )}
                   >
                     <motion.div 
-                      className="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm"
+                      className="absolute left-1 top-1 w-4 h-4 rounded-full bg-surface-main shadow-sm"
                       animate={{ x: draft.publicVisibility ? 20 : 0 }}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
@@ -296,7 +296,7 @@ export default function ProjectEditor({ project, config }) {
       </main>
 
       {/* Footer Actions */}
-      <footer className="sticky bottom-0 z-30 bg-white border-t border-border-subtle px-6 py-4 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+      <footer className="sticky bottom-0 z-30 bg-surface-main border-t border-border-subtle px-6 py-4 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
         <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-text-secondary font-medium">
             <Clock size={14} className="text-status-active" />

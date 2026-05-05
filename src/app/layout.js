@@ -1,6 +1,7 @@
 import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,11 +23,15 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${inter.variable} ${manrope.variable} h-full antialiased`}
+      data-theme="gold"
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-surface-alt font-sans text-on-surface">
-        <DashboardLayout>
-          {children}
-        </DashboardLayout>
+        <ThemeProvider>
+          <DashboardLayout>
+            {children}
+          </DashboardLayout>
+        </ThemeProvider>
       </body>
     </html>
   );

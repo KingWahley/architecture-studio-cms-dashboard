@@ -49,7 +49,7 @@ export default async function DashboardPage() {
                 <Link
                   key={action.label}
                   href={action.href}
-                  className="group flex items-center gap-4 rounded-xl border border-border-subtle bg-white p-4 transition-all hover:border-accent-deep-blue hover:shadow-architectural"
+                  className="group flex items-center gap-4 rounded-xl border border-border-subtle bg-surface-main p-4 transition-all hover:border-accent-deep-blue hover:shadow-architectural"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-alt transition-colors group-hover:border-accent-deep-blue/20 group-hover:bg-accent-deep-blue/5">
                     <Plus size={18} className="text-text-secondary group-hover:text-accent-deep-blue" />
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
                   <div key={msg.id} className="relative pl-8">
                     {/* Timeline Dot */}
                     <div className={cn(
-                      "absolute left-0 top-1.5 h-4 w-4 rounded-full border-4 border-white shadow-sm transition-colors",
+                      "absolute left-0 top-1.5 h-4 w-4 rounded-full border-4 border-surface-main shadow-sm transition-colors",
                       idx === 0 ? "bg-status-active" : "bg-accent-muted-gold"
                     )} />
                     
