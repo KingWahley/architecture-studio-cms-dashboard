@@ -5,6 +5,7 @@ const badgeVariants = {
   active: "bg-status-active/10 text-status-active border-status-active/20",
   draft: "bg-status-draft/10 text-status-draft border-status-draft/20",
   ongoing: "bg-accent-deep-blue/10 text-accent-deep-blue border-accent-deep-blue/20",
+  upcoming: "bg-accent-deep-blue/10 text-accent-deep-blue border-accent-deep-blue/20",
   completed: "bg-status-active/10 text-status-active border-status-active/20",
   new: "bg-accent-muted-gold/10 text-accent-muted-gold border-accent-muted-gold/20",
 }

@@ -297,7 +297,7 @@ const DEFAULT_CONTENT = {
       date: "Today",
       time: "14:00 - 15:00",
       location: "Virtual (Zoom)",
-      status: "new",
+      status: "upcoming",
       notes: "Collect site context and discuss budget expectations.",
       updatedAt: "2026-05-01T09:00:00.000Z",
     },
@@ -308,7 +308,7 @@ const DEFAULT_CONTENT = {
       date: "Tomorrow",
       time: "10:00 - 11:30",
       location: "Studio Office",
-      status: "ongoing",
+      status: "upcoming",
       notes: "Bring revised floor plans and updated facade options.",
       updatedAt: "2026-04-30T17:15:00.000Z",
     },
@@ -831,6 +831,11 @@ function sanitizeValue(field, value) {
   return value.trim();
 }
 
+function normalizeAppointmentStatus(value) {
+  const normalized = typeof value === "string" ? value.trim().toLowerCase() : "";
+  return normalized === "completed" ? "completed" : "upcoming";
+}
+
 function sanitizeRecord(entityKey, payload, existingItem = {}) {
   const config = ENTITY_CONFIGS[entityKey];
   const record = {};
@@ -839,7 +844,10 @@ function sanitizeRecord(entityKey, payload, existingItem = {}) {
     const incoming = payload[field.name];
     const fallback = existingItem[field.name] ?? "";
     const value = incoming === undefined ? fallback : incoming;
-    record[field.name] = sanitizeValue(field, value);
+    record[field.name] =
+      entityKey === "appointments" && field.name === "status"
+        ? normalizeAppointmentStatus(value)
+        : sanitizeValue(field, value);
   }
 
   return record;
@@ -899,9 +907,15 @@ function validateProjectPayload(payload) {
 
 export async function getEntityBundle(entityKey) {
   const content = await readContent();
+  const normalizedItems = [...(content[entityKey] ?? [])].map((item) =>
+    entityKey === "appointments"
+      ? { ...item, status: normalizeAppointmentStatus(item.status) }
+      : item,
+  );
+
   return {
     config: ENTITY_CONFIGS[entityKey],
-    items: [...(content[entityKey] ?? [])].sort((left, right) => {
+    items: normalizedItems.sort((left, right) => {
       return new Date(right.updatedAt ?? 0).getTime() - new Date(left.updatedAt ?? 0).getTime();
     }),
   };
@@ -1350,7 +1364,10 @@ export async function getDashboardData() {
   const projects = content.projects ?? [];
   const vacancies = content.vacancies ?? [];
   const messages = content.messages ?? [];
-  const appointments = content.appointments ?? [];
+  const appointments = (content.appointments ?? []).map((item) => ({
+    ...item,
+    status: normalizeAppointmentStatus(item.status),
+  }));
 
   const stats = [
     {
@@ -1374,7 +1391,7 @@ export async function getDashboardData() {
     {
       title: "Appointments",
       value: appointments.length,
-      trend: `${appointments.filter((item) => item.status !== "completed").length} upcoming or active`,
+      trend: `${appointments.filter((item) => item.status === "upcoming").length} upcoming`,
       href: "/appointments",
     },
   ];
@@ -1406,6 +1423,7 @@ export async function getDashboardData() {
     .slice(0, 5);
 
   const upcomingAppointments = appointments
+    .filter((item) => item.status === "upcoming")
     .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
     .slice(0, 4);
 

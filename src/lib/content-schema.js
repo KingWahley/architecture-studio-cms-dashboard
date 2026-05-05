@@ -143,7 +143,7 @@ export const ENTITY_CONFIGS = {
         label: "Status",
         type: "select",
         required: true,
-        options: ["new", "ongoing", "completed", "draft"],
+        options: ["upcoming", "completed"],
       },
       { name: "notes", label: "Notes", type: "textarea" },
     ],

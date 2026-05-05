@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState, useSyncExternalStore, useTransition } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, LayoutGrid, List, Pencil, Plus, Save, Search, Trash2, X, Upload } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, LayoutGrid, List, Pencil, Plus, Save, Search, Trash2, X, Upload } from "lucide-react";
 import { deleteContentItem, saveContentItem, uploadFile } from "@/app/actions/content";
 import MediaLibraryPickerModal from "@/components/media/MediaLibraryPickerModal";
 import { Button } from "@/components/ui/Button";
@@ -85,6 +85,7 @@ function DisplayModeToggle({ mode, onChange }) {
 
 export default function CollectionManager({ entityKey, config, items, mediaItems, customEditRoute }) {
   const [query, setQuery] = useState("");
+  const [appointmentFilter, setAppointmentFilter] = useState("upcoming");
   const [activeId, setActiveId] = useState(null);
   const [draft, setDraft] = useState(() => getEmptyValues(config.fields));
   const [mode, setMode] = useState("idle");
@@ -99,21 +100,30 @@ export default function CollectionManager({ entityKey, config, items, mediaItems
     () => DEFAULT_VIEW_MODE
   );
 
+  const supportsReadOnlyDetailView = config.readOnly && entityKey === "messages";
+  const supportsAppointmentCompletion = entityKey === "appointments";
+  const filteredSourceItems = useMemo(() => {
+    if (!supportsAppointmentCompletion) {
+      return items;
+    }
+
+    return items.filter((item) => item.status === appointmentFilter);
+  }, [appointmentFilter, items, supportsAppointmentCompletion]);
+
   const filteredItems = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     if (!normalizedQuery) {
-      return items;
+      return filteredSourceItems;
     }
 
-    return items.filter((item) =>
+    return filteredSourceItems.filter((item) =>
       Object.values(item).some((value) => String(value ?? "").toLowerCase().includes(normalizedQuery))
     );
-  }, [items, query]);
+  }, [filteredSourceItems, query]);
 
   const activeItem = useMemo(() => items.find((item) => item.id === activeId) ?? null, [activeId, items]);
   const isCreateMode = mode === "create";
-  const supportsReadOnlyDetailView = config.readOnly && entityKey === "messages";
   const resolvedReadOnlyActiveItem = useMemo(() => {
     if (!supportsReadOnlyDetailView) {
       return null;
@@ -226,6 +236,24 @@ export default function CollectionManager({ entityKey, config, items, mediaItems
     } catch (error) {
       setFeedback("Upload failed: " + error.message);
     }
+  };
+
+  const handleMarkCompleted = (item) => {
+    if (item[config.statusField] === "completed") {
+      return;
+    }
+
+    setFeedback("");
+
+    startSaving(async () => {
+      const result = await saveContentItem({
+        entityKey,
+        id: item.id,
+        status: "completed",
+      });
+
+      setFeedback(result.message);
+    });
   };
 
   const renderField = (field, className) => (
@@ -402,6 +430,26 @@ export default function CollectionManager({ entityKey, config, items, mediaItems
                 className="h-11 pl-11 pr-4 leading-none"
               />
             </div>
+            {supportsAppointmentCompletion ? (
+              <div className="inline-flex h-11 items-center rounded-full border border-border-subtle bg-surface-alt/90 p-1">
+                {["upcoming", "completed"].map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => setAppointmentFilter(status)}
+                    className={cn(
+                      "rounded-full px-4 py-2 text-sm font-medium capitalize transition-colors",
+                      appointmentFilter === status
+                        ? "bg-accent-deep-blue text-white"
+                        : "text-text-secondary hover:bg-surface-main hover:text-on-surface",
+                    )}
+                    aria-pressed={appointmentFilter === status}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             {!config.readOnly &&
               (customEditRoute ? (
                 <Link
@@ -419,6 +467,12 @@ export default function CollectionManager({ entityKey, config, items, mediaItems
               ))}
           </div>
         </div>
+
+        {config.readOnly && feedback ? (
+          <div className="rounded-xl border border-status-active/20 bg-status-active/10 px-4 py-3 text-sm text-status-active">
+            {feedback}
+          </div>
+        ) : null}
 
         <div
           className={cn(
@@ -554,6 +608,22 @@ export default function CollectionManager({ entityKey, config, items, mediaItems
                             >
                               {item[config.statusField] || "draft"}
                             </StatusBadge>
+                            {supportsAppointmentCompletion && item[config.statusField] !== "completed" ? (
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="gap-2"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleMarkCompleted(item);
+                                }}
+                                disabled={isPending}
+                              >
+                                <Check size={14} />
+                                Mark completed
+                              </Button>
+                            ) : null}
                             {!config.readOnly && (
                               <div className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                                 {customEditRoute ? (

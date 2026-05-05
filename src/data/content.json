@@ -4,36 +4,66 @@
       "id": "project-1",
       "title": "Lagos Marina Towers",
       "category": "Commercial",
-      "location": "Lagos, NG",
-      "year": "2025",
-      "status": "ongoing",
-      "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
-      "summary": "Mixed-use high-rise with phased delivery and active construction oversight.",
+      "location": {
+        "city": "Lagos",
+        "state": "NG",
+        "country": ""
+      },
+      "status": "Ongoing",
+      "description": "Mixed-use high-rise with phased delivery and active construction oversight.",
+      "sections": [],
+      "gallery": [
+        {
+          "id": "gallery-c3b42a1c-9a87-4d65-808d-01dccde8cb28",
+          "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+          "alt": ""
+        }
+      ],
+      "createdAt": "2026-04-30T11:00:00.000Z",
       "updatedAt": "2026-04-30T11:00:00.000Z"
     },
     {
       "id": "project-2",
       "title": "Ikoyi Residence",
       "category": "Residential",
-      "location": "Lagos, NG",
-      "year": "2024",
-      "status": "completed",
-      "image": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
-      "summary": "Private residential build focused on light, texture, and low-maintenance detailing.",
-      "updatedAt": "2026-05-04T18:38:05.490Z",
-      "coordinates": "",
-      "publicVisibility": "",
-      "gallery": ""
+      "location": {
+        "city": "Lagos",
+        "state": "NG",
+        "country": ""
+      },
+      "status": "Completed",
+      "description": "Private residential build focused on light, texture, and low-maintenance detailing.",
+      "sections": [],
+      "gallery": [
+        {
+          "id": "gallery-aeda5322-405f-49e3-8ea2-57064ecf2039",
+          "url": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
+          "alt": ""
+        }
+      ],
+      "createdAt": "2026-05-04T18:38:05.490Z",
+      "updatedAt": "2026-05-04T18:38:05.490Z"
     },
     {
       "id": "project-3",
       "title": "Victoria Island Mall",
       "category": "Retail",
-      "location": "Lagos, NG",
-      "year": "2026",
-      "status": "draft",
-      "image": "https://images.unsplash.com/photo-1519567281799-9637b92f44eb?q=80&w=2070&auto=format&fit=crop",
-      "summary": "Concept-stage retail destination preparing for stakeholder review.",
+      "location": {
+        "city": "Lagos",
+        "state": "NG",
+        "country": ""
+      },
+      "status": "On Hold",
+      "description": "Concept-stage retail destination preparing for stakeholder review.",
+      "sections": [],
+      "gallery": [
+        {
+          "id": "gallery-cba2109f-ed29-471c-bbc3-aa9e1b73710a",
+          "url": "https://images.unsplash.com/photo-1519567281799-9637b92f44eb?q=80&w=2070&auto=format&fit=crop",
+          "alt": ""
+        }
+      ],
+      "createdAt": "2026-04-18T15:10:00.000Z",
       "updatedAt": "2026-04-18T15:10:00.000Z"
     }
   ],
@@ -44,10 +74,13 @@
       "location": "Lagos, NG",
       "type": "Full-time",
       "applicants": 12,
-      "status": "active",
+      "status": "open",
       "posted": "Oct 10, 2025",
       "summary": "Lead concept development, presentation decks, and client-facing design reviews.",
-      "updatedAt": "2026-04-29T08:15:00.000Z"
+      "updatedAt": "2026-04-29T08:15:00.000Z",
+      "description": "Lead concept development, presentation decks, and client-facing design reviews.",
+      "skills": [],
+      "createdAt": "2026-04-29T08:15:00.000Z"
     },
     {
       "id": "vacancy-2",
@@ -55,10 +88,13 @@
       "location": "Abuja, NG",
       "type": "Full-time",
       "applicants": 5,
-      "status": "active",
+      "status": "open",
       "posted": "Oct 15, 2025",
       "summary": "Coordinate multidisciplinary delivery and maintain project reporting cadence.",
-      "updatedAt": "2026-04-28T12:00:00.000Z"
+      "updatedAt": "2026-04-28T12:00:00.000Z",
+      "description": "Coordinate multidisciplinary delivery and maintain project reporting cadence.",
+      "skills": [],
+      "createdAt": "2026-04-28T12:00:00.000Z"
     },
     {
       "id": "vacancy-3",
@@ -66,10 +102,13 @@
       "location": "Remote",
       "type": "Contract",
       "applicants": 24,
-      "status": "draft",
+      "status": "closed",
       "posted": "Unpublished",
       "summary": "Support modeling standards and documentation workflows for large programs.",
-      "updatedAt": "2026-04-16T10:45:00.000Z"
+      "updatedAt": "2026-04-16T10:45:00.000Z",
+      "description": "Support modeling standards and documentation workflows for large programs.",
+      "skills": [],
+      "createdAt": "2026-04-16T10:45:00.000Z"
     }
   ],
   "blog": [
@@ -117,7 +156,11 @@
       "status": "active",
       "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
       "bio": "Leads studio direction, key client relationships, and final design approvals.",
-      "updatedAt": "2026-04-29T09:00:00.000Z"
+      "updatedAt": "2026-04-29T09:00:00.000Z",
+      "title": "",
+      "designation": "Principal Architect",
+      "qualifications": "",
+      "createdAt": "2026-04-29T09:00:00.000Z"
     },
     {
       "id": "team-2",
@@ -128,7 +171,11 @@
       "status": "active",
       "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
       "bio": "Owns interior concept development and material storytelling across premium projects.",
-      "updatedAt": "2026-04-24T10:00:00.000Z"
+      "updatedAt": "2026-04-24T10:00:00.000Z",
+      "title": "",
+      "designation": "Senior Interior Designer",
+      "qualifications": "",
+      "createdAt": "2026-04-24T10:00:00.000Z"
     }
   ],
   "applications": [
@@ -140,7 +187,13 @@
       "date": "Oct 24, 2025",
       "status": "new",
       "notes": "Resume received and portfolio review pending.",
-      "updatedAt": "2026-04-30T10:20:00.000Z"
+      "updatedAt": "2026-04-30T10:20:00.000Z",
+      "phone": "",
+      "vacancyId": "",
+      "vacancyTitle": "Senior Architect",
+      "dateApplied": "Oct 24, 2025",
+      "resumeUrl": "",
+      "createdAt": "2026-04-30T10:20:00.000Z"
     },
     {
       "id": "application-2",
@@ -150,7 +203,13 @@
       "date": "Oct 22, 2025",
       "status": "completed",
       "notes": "Interview complete and feedback shared with hiring team.",
-      "updatedAt": "2026-04-23T13:40:00.000Z"
+      "updatedAt": "2026-04-23T13:40:00.000Z",
+      "phone": "",
+      "vacancyId": "",
+      "vacancyTitle": "Interior Designer",
+      "dateApplied": "Oct 22, 2025",
+      "resumeUrl": "",
+      "createdAt": "2026-04-23T13:40:00.000Z"
     },
     {
       "id": "application-3",
@@ -160,7 +219,13 @@
       "date": "Oct 20, 2025",
       "status": "ongoing",
       "notes": "Shortlisted for second-round conversation.",
-      "updatedAt": "2026-04-19T08:05:00.000Z"
+      "updatedAt": "2026-04-19T08:05:00.000Z",
+      "phone": "",
+      "vacancyId": "",
+      "vacancyTitle": "Project Manager",
+      "dateApplied": "Oct 20, 2025",
+      "resumeUrl": "",
+      "createdAt": "2026-04-19T08:05:00.000Z"
     }
   ],
   "appointments": [
@@ -171,9 +236,10 @@
       "date": "Today",
       "time": "14:00 - 15:00",
       "location": "Virtual (Zoom)",
-      "status": "new",
+      "status": "completed",
       "notes": "Collect site context and discuss budget expectations.",
-      "updatedAt": "2026-05-01T09:00:00.000Z"
+      "updatedAt": "2026-05-05T12:47:49.018Z",
+      "createdAt": "2026-05-01T09:00:00.000Z"
     },
     {
       "id": "appointment-2",
@@ -182,7 +248,7 @@
       "date": "Tomorrow",
       "time": "10:00 - 11:30",
       "location": "Studio Office",
-      "status": "ongoing",
+      "status": "upcoming",
       "notes": "Bring revised floor plans and updated facade options.",
       "updatedAt": "2026-04-30T17:15:00.000Z"
     }
@@ -219,7 +285,13 @@
       "status": "active",
       "url": "",
       "description": "Folder for approved renders and visual storytelling assets.",
-      "updatedAt": "2026-04-28T11:11:00.000Z"
+      "updatedAt": "2026-04-28T11:11:00.000Z",
+      "alt": "",
+      "caption": "",
+      "mimeType": "image/jpeg",
+      "extension": "project renders",
+      "size": 0,
+      "createdAt": "2026-04-28T11:11:00.000Z"
     },
     {
       "id": "media-2",
@@ -228,7 +300,13 @@
       "status": "active",
       "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
       "description": "Exterior hero shot for the Marina Towers case study.",
-      "updatedAt": "2026-04-27T15:01:00.000Z"
+      "updatedAt": "2026-04-27T15:01:00.000Z",
+      "alt": "",
+      "caption": "",
+      "mimeType": "image/jpeg",
+      "extension": "jpg",
+      "size": 0,
+      "createdAt": "2026-04-27T15:01:00.000Z"
     },
     {
       "id": "media-3",
@@ -237,7 +315,54 @@
       "status": "draft",
       "url": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
       "description": "Interior visual under review for residential portfolio updates.",
-      "updatedAt": "2026-04-22T09:41:00.000Z"
+      "updatedAt": "2026-04-22T09:41:00.000Z",
+      "alt": "",
+      "caption": "",
+      "mimeType": "image/jpeg",
+      "extension": "jpg",
+      "size": 0,
+      "createdAt": "2026-04-22T09:41:00.000Z"
+    }
+  ],
+  "contactDetails": {
+    "address": "12 Admiralty Way\nLekki Phase 1\nLagos, Nigeria",
+    "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126866.40256075335!2d3.4132658!3d6.4697845!2m3!1f0!2f0!3f0",
+    "phones": [
+      "+234 800 123 4567",
+      "+234 800 987 6543"
+    ],
+    "email": "hello@pieach.com",
+    "socials": {
+      "facebook": "https://facebook.com/pieachstudio",
+      "instagram": "https://instagram.com/pieachstudio",
+      "twitter": "https://x.com/pieachstudio",
+      "linkedin": "https://linkedin.com/company/pieachstudio"
+    },
+    "additionalPlatforms": [
+      {
+        "id": "contact-platform-1",
+        "platform": "Behance",
+        "url": "https://behance.net/pieachstudio"
+      }
+    ],
+    "updatedAt": "2026-05-01T09:30:00.000Z"
+  },
+  "projectCategories": [
+    {
+      "id": "project-category-residential",
+      "name": "Residential"
+    },
+    {
+      "id": "project-category-commercial",
+      "name": "Commercial"
+    },
+    {
+      "id": "project-category-industrial",
+      "name": "Industrial"
+    },
+    {
+      "id": "project-category-56db7ab4-9591-4dbb-963e-f2a8705fc4ea",
+      "name": "Retail"
     }
   ]
 }
