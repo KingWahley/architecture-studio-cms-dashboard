@@ -1,31 +1,22 @@
-import { getEntityBundle } from "@/lib/content-store";
-import ProjectEditor from "./ProjectEditor";
+import ProjectForm from "@/components/projects/ProjectForm";
+import { getProjectById, getProjectsBundle } from "@/lib/content-store";
 import { notFound } from "next/navigation";
 
 export default async function EditProjectPage({ params }) {
   const { id } = await params;
-  const { config, items } = await getEntityBundle("projects");
-  
-  let project = null;
   if (id === "new") {
-    // Generate empty project based on fields
-    project = Object.fromEntries(
-      config.fields.map(f => [f.name, f.type === "number" ? 0 : f.type === "boolean" ? false : f.type === "json" ? [] : ""])
-    );
-    project.id = "new";
-  } else {
-    project = items.find(p => p.id === id);
-    if (!project) {
-      notFound();
-    }
+    const { categories } = await getProjectsBundle();
+    return <ProjectForm project={{ id: "new" }} categories={categories} />;
   }
 
-  return (
-    <div className="flex-1 overflow-y-auto">
-      <ProjectEditor 
-        project={project} 
-        config={config} 
-      />
-    </div>
-  );
+  const [project, { categories }] = await Promise.all([
+    getProjectById(id),
+    getProjectsBundle(),
+  ]);
+
+  if (!project) {
+    notFound();
+  }
+
+  return <ProjectForm project={project} categories={categories} />;
 }

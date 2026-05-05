@@ -2,9 +2,30 @@ import "server-only";
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { ENTITY_CONFIGS, ENTITY_ORDER } from "@/lib/content-schema";
+import {
+  DEFAULT_PROJECT_CATEGORIES,
+  ENTITY_CONFIGS,
+  ENTITY_ORDER,
+  PROJECT_STATUSES,
+} from "@/lib/content-schema";
 
 const DATA_FILE = path.join(process.cwd(), "src", "data", "content.json");
+
+function createProjectSection(title, body) {
+  return {
+    id: `section-${crypto.randomUUID()}`,
+    title,
+    body,
+  };
+}
+
+function createProjectGalleryItem(url, alt = "") {
+  return {
+    id: `gallery-${crypto.randomUUID()}`,
+    url,
+    alt,
+  };
+}
 
 const DEFAULT_CONTENT = {
   projects: [
@@ -12,36 +33,93 @@ const DEFAULT_CONTENT = {
       id: "project-1",
       title: "Lagos Marina Towers",
       category: "Commercial",
-      location: "Lagos, NG",
-      year: "2025",
-      status: "ongoing",
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
-      summary: "Mixed-use high-rise with phased delivery and active construction oversight.",
+      location: {
+        city: "Lagos",
+        state: "Lagos",
+        country: "Nigeria",
+      },
+      status: "Ongoing",
+      description:
+        "<p>Mixed-use high-rise with phased delivery, coastal resilience planning, and active construction oversight.</p>",
+      sections: [
+        createProjectSection(
+          "Design Direction",
+          "<p>A layered podium and tower composition balances retail activation below with premium workspaces above.</p>",
+        ),
+        createProjectSection(
+          "Delivery Notes",
+          "<p>Coordination focuses on facade performance, phased tenant handover, and traffic circulation around the marina edge.</p>",
+        ),
+      ],
+      gallery: [
+        createProjectGalleryItem(
+          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+          "Lagos Marina Towers exterior",
+        ),
+        createProjectGalleryItem(
+          "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=1974&auto=format&fit=crop",
+          "Marina Towers lobby concept",
+        ),
+      ],
+      createdAt: "2026-04-12T08:00:00.000Z",
       updatedAt: "2026-04-30T11:00:00.000Z",
     },
     {
       id: "project-2",
       title: "Ikoyi Residence",
       category: "Residential",
-      location: "Lagos, NG",
-      year: "2024",
-      status: "completed",
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
-      summary: "Private residential build focused on light, texture, and low-maintenance detailing.",
+      location: {
+        city: "Ikoyi",
+        state: "Lagos",
+        country: "Nigeria",
+      },
+      status: "Completed",
+      description:
+        "<p>Private residential build focused on natural light, tactile finishes, and low-maintenance detailing.</p>",
+      sections: [
+        createProjectSection(
+          "Client Brief",
+          "<p>The home was shaped around calm entertaining spaces, shaded terraces, and practical family circulation.</p>",
+        ),
+      ],
+      gallery: [
+        createProjectGalleryItem(
+          "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop",
+          "Ikoyi Residence exterior",
+        ),
+      ],
+      createdAt: "2026-03-21T12:20:00.000Z",
       updatedAt: "2026-04-25T09:30:00.000Z",
     },
     {
       id: "project-3",
       title: "Victoria Island Mall",
       category: "Retail",
-      location: "Lagos, NG",
-      year: "2026",
-      status: "draft",
-      image: "https://images.unsplash.com/photo-1519567281799-9637b92f44eb?q=80&w=2070&auto=format&fit=crop",
-      summary: "Concept-stage retail destination preparing for stakeholder review.",
+      location: {
+        city: "Victoria Island",
+        state: "Lagos",
+        country: "Nigeria",
+      },
+      status: "On Hold",
+      description:
+        "<p>Concept-stage retail destination paused while stakeholders review the revised leasing and access strategy.</p>",
+      sections: [
+        createProjectSection(
+          "Current Status",
+          "<p>The scheme is on hold pending commercial approvals and traffic impact review.</p>",
+        ),
+      ],
+      gallery: [
+        createProjectGalleryItem(
+          "https://images.unsplash.com/photo-1519567281799-9637b92f44eb?q=80&w=2070&auto=format&fit=crop",
+          "Victoria Island Mall facade concept",
+        ),
+      ],
+      createdAt: "2026-04-08T15:10:00.000Z",
       updatedAt: "2026-04-18T15:10:00.000Z",
     },
   ],
+  projectCategories: DEFAULT_PROJECT_CATEGORIES,
   vacancies: [
     {
       id: "vacancy-1",
@@ -197,6 +275,169 @@ const DEFAULT_CONTENT = {
   ],
 };
 
+function ensureProjectCategoryRecords(categories = []) {
+  const normalized = categories
+    .map((category) => {
+      if (typeof category === "string") {
+        return {
+          id: `project-category-${category.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+          name: category.trim(),
+        };
+      }
+
+      return {
+        id:
+          typeof category?.id === "string" && category.id.trim()
+            ? category.id.trim()
+            : `project-category-${crypto.randomUUID()}`,
+        name: typeof category?.name === "string" ? category.name.trim() : "",
+      };
+    })
+    .filter((category) => category.name);
+
+  const unique = [];
+  const seen = new Set();
+
+  for (const category of normalized) {
+    const key = category.name.toLowerCase();
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    unique.push(category);
+  }
+
+  return unique;
+}
+
+function sanitizeProjectRichText(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.trim();
+}
+
+function normalizeProjectLocation(location, fallbackLocation = {}) {
+  if (typeof location === "string") {
+    const parts = location.split(",").map((part) => part.trim()).filter(Boolean);
+    return {
+      city: parts[0] ?? "",
+      state: parts[1] ?? "",
+      country: parts[2] ?? "",
+    };
+  }
+
+  return {
+    city: typeof location?.city === "string" ? location.city.trim() : fallbackLocation.city ?? "",
+    state: typeof location?.state === "string" ? location.state.trim() : fallbackLocation.state ?? "",
+    country: typeof location?.country === "string" ? location.country.trim() : fallbackLocation.country ?? "",
+  };
+}
+
+function normalizeProjectSections(sections) {
+  if (!Array.isArray(sections)) {
+    return [];
+  }
+
+  return sections
+    .map((section) => ({
+      id:
+        typeof section?.id === "string" && section.id.trim()
+          ? section.id.trim()
+          : `section-${crypto.randomUUID()}`,
+      title: typeof section?.title === "string" ? section.title.trim() : "",
+      body: sanitizeProjectRichText(section?.body),
+    }))
+    .filter((section) => section.title || section.body);
+}
+
+function normalizeProjectGallery(gallery, fallbackImage = "") {
+  if (typeof gallery === "string") {
+    if (!gallery.trim()) {
+      return fallbackImage ? [createProjectGalleryItem(fallbackImage)] : [];
+    }
+
+    try {
+      return normalizeProjectGallery(JSON.parse(gallery), fallbackImage);
+    } catch {
+      return [createProjectGalleryItem(gallery.trim())];
+    }
+  }
+
+  if (!Array.isArray(gallery)) {
+    return fallbackImage ? [createProjectGalleryItem(fallbackImage)] : [];
+  }
+
+  return gallery
+    .map((item) => {
+      if (typeof item === "string") {
+        const url = item.trim();
+        return url ? createProjectGalleryItem(url) : null;
+      }
+
+      const url = typeof item?.url === "string" ? item.url.trim() : "";
+      if (!url) {
+        return null;
+      }
+
+      return {
+        id:
+          typeof item?.id === "string" && item.id.trim()
+            ? item.id.trim()
+            : `gallery-${crypto.randomUUID()}`,
+        url,
+        alt: typeof item?.alt === "string" ? item.alt.trim() : "",
+      };
+    })
+    .filter(Boolean);
+}
+
+function normalizeProjectStatus(status) {
+  if (typeof status !== "string") {
+    return PROJECT_STATUSES[0];
+  }
+
+  const normalized = status.trim().toLowerCase();
+
+  if (normalized === "ongoing construction" || normalized === "ongoing") {
+    return "Ongoing";
+  }
+
+  if (normalized === "completed" || normalized === "published") {
+    return "Completed";
+  }
+
+  if (normalized === "on hold" || normalized === "draft") {
+    return "On Hold";
+  }
+
+  return PROJECT_STATUSES.includes(status.trim()) ? status.trim() : PROJECT_STATUSES[0];
+}
+
+function normalizeProjectRecord(project) {
+  const location = normalizeProjectLocation(project.location);
+  const gallery = normalizeProjectGallery(project.gallery, project.image);
+
+  return {
+    id: project.id,
+    title: typeof project.title === "string" ? project.title.trim() : "",
+    category: typeof project.category === "string" ? project.category.trim() : "",
+    location,
+    status: normalizeProjectStatus(project.status),
+    description: sanitizeProjectRichText(project.description ?? project.summary),
+    sections: normalizeProjectSections(project.sections),
+    gallery,
+    createdAt: project.createdAt ?? project.updatedAt ?? new Date().toISOString(),
+    updatedAt: project.updatedAt ?? project.createdAt ?? new Date().toISOString(),
+  };
+}
+
+function formatProjectLocation(location) {
+  return [location?.city, location?.state, location?.country].filter(Boolean).join(", ");
+}
+
 async function ensureDataFile() {
   try {
     await fs.access(DATA_FILE);
@@ -216,7 +457,22 @@ export async function readContent() {
     return DEFAULT_CONTENT;
   }
 
-  return parsed;
+  const normalizedProjects = (parsed.projects ?? []).map(normalizeProjectRecord);
+  const storedCategories = ensureProjectCategoryRecords(parsed.projectCategories ?? []);
+  const derivedCategories = normalizedProjects
+    .map((project) => project.category)
+    .filter(Boolean)
+    .map((name) => ({ name }));
+
+  return {
+    ...parsed,
+    projects: normalizedProjects,
+    projectCategories: ensureProjectCategoryRecords([
+      ...DEFAULT_PROJECT_CATEGORIES,
+      ...storedCategories,
+      ...derivedCategories,
+    ]),
+  };
 }
 
 async function writeContent(content) {
@@ -250,6 +506,58 @@ function sanitizeRecord(entityKey, payload, existingItem = {}) {
   return record;
 }
 
+function validateProjectPayload(payload) {
+  const title = typeof payload.title === "string" ? payload.title.trim() : "";
+  const category = typeof payload.category === "string" ? payload.category.trim() : "";
+  const description = sanitizeProjectRichText(payload.description);
+  const location = normalizeProjectLocation(payload.location);
+  const status = normalizeProjectStatus(payload.status);
+
+  const errors = {};
+
+  if (!title) {
+    errors.title = "Project title is required.";
+  }
+
+  if (!category) {
+    errors.category = "Select a category for this project.";
+  }
+
+  if (!location.city) {
+    errors.city = "City is required.";
+  }
+
+  if (!location.state) {
+    errors.state = "State is required.";
+  }
+
+  if (!location.country) {
+    errors.country = "Country is required.";
+  }
+
+  if (!description) {
+    errors.description = "Project description is required.";
+  }
+
+  if (!PROJECT_STATUSES.includes(status)) {
+    errors.status = "Select a valid project status.";
+  }
+
+  return {
+    valid: Object.keys(errors).length === 0,
+    errors,
+    normalized: {
+      title,
+      category,
+      location,
+      status,
+      description,
+      sections: normalizeProjectSections(payload.sections),
+      gallery: normalizeProjectGallery(payload.gallery),
+    },
+  };
+}
+
 export async function getEntityBundle(entityKey) {
   const content = await readContent();
   return {
@@ -258,6 +566,24 @@ export async function getEntityBundle(entityKey) {
       return new Date(right.updatedAt ?? 0).getTime() - new Date(left.updatedAt ?? 0).getTime();
     }),
   };
+}
+
+export async function getProjectsBundle() {
+  const content = await readContent();
+  const items = [...(content.projects ?? [])].sort((left, right) => {
+    return new Date(right.updatedAt ?? 0).getTime() - new Date(left.updatedAt ?? 0).getTime();
+  });
+
+  return {
+    config: ENTITY_CONFIGS.projects,
+    items,
+    categories: content.projectCategories ?? [],
+  };
+}
+
+export async function getProjectById(id) {
+  const content = await readContent();
+  return (content.projects ?? []).find((project) => project.id === id) ?? null;
 }
 
 export async function saveEntityItem(entityKey, payload) {
@@ -281,10 +607,136 @@ export async function saveEntityItem(entityKey, payload) {
   return item;
 }
 
+export async function saveProject(payload) {
+  const content = await readContent();
+  const currentItems = content.projects ?? [];
+  const existingItem = currentItems.find((item) => item.id === payload.id);
+  const validation = validateProjectPayload(payload);
+
+  if (!validation.valid) {
+    return {
+      ok: false,
+      errors: validation.errors,
+      message: "Please fix the highlighted project fields.",
+    };
+  }
+
+  const timestamp = new Date().toISOString();
+  const item = {
+    id: existingItem?.id ?? `project-${crypto.randomUUID()}`,
+    ...validation.normalized,
+    createdAt: existingItem?.createdAt ?? timestamp,
+    updatedAt: timestamp,
+  };
+
+  content.projects = existingItem
+    ? currentItems.map((currentItem) => (currentItem.id === item.id ? item : currentItem))
+    : [item, ...currentItems];
+
+  content.projectCategories = ensureProjectCategoryRecords([
+    ...(content.projectCategories ?? []),
+    { name: item.category },
+  ]);
+
+  await writeContent(content);
+
+  return {
+    ok: true,
+    item,
+    message: `${ENTITY_CONFIGS.projects.singular} saved successfully.`,
+  };
+}
+
 export async function removeEntityItem(entityKey, id) {
   const content = await readContent();
   content[entityKey] = (content[entityKey] ?? []).filter((item) => item.id !== id);
   await writeContent(content);
+}
+
+export async function removeProject(id) {
+  const content = await readContent();
+  content.projects = (content.projects ?? []).filter((item) => item.id !== id);
+  await writeContent(content);
+}
+
+export async function saveProjectCategory(payload) {
+  const content = await readContent();
+  const name = typeof payload?.name === "string" ? payload.name.trim() : "";
+
+  if (!name) {
+    return {
+      ok: false,
+      message: "Category name is required.",
+      errors: { name: "Category name is required." },
+    };
+  }
+
+  const currentCategories = ensureProjectCategoryRecords(content.projectCategories ?? []);
+  const existingCategory = currentCategories.find((category) => category.id === payload.id);
+  const duplicate = currentCategories.find(
+    (category) =>
+      category.name.toLowerCase() === name.toLowerCase() &&
+      category.id !== payload.id,
+  );
+
+  if (duplicate) {
+    return {
+      ok: false,
+      message: "A category with this name already exists.",
+      errors: { name: "Choose a unique category name." },
+    };
+  }
+
+  const category = existingCategory
+    ? { ...existingCategory, name }
+    : { id: `project-category-${crypto.randomUUID()}`, name };
+
+  content.projectCategories = existingCategory
+    ? currentCategories.map((current) => (current.id === category.id ? category : current))
+    : [...currentCategories, category];
+
+  if (existingCategory && existingCategory.name !== category.name) {
+    content.projects = (content.projects ?? []).map((project) =>
+      project.category === existingCategory.name
+        ? { ...project, category: category.name, updatedAt: new Date().toISOString() }
+        : project,
+    );
+  }
+
+  await writeContent(content);
+
+  return {
+    ok: true,
+    item: category,
+    message: "Project category saved.",
+  };
+}
+
+export async function deleteProjectCategory(id) {
+  const content = await readContent();
+  const categories = ensureProjectCategoryRecords(content.projectCategories ?? []);
+  const category = categories.find((item) => item.id === id);
+
+  if (!category) {
+    return {
+      ok: false,
+      message: "Category not found.",
+    };
+  }
+
+  content.projectCategories = categories.filter((item) => item.id !== id);
+  content.projects = (content.projects ?? []).map((project) =>
+    project.category === category.name
+      ? { ...project, category: "", updatedAt: new Date().toISOString() }
+      : project,
+  );
+
+  await writeContent(content);
+
+  return {
+    ok: true,
+    message: "Project category deleted.",
+  };
 }
 
 function labelForItem(entityKey, item) {
@@ -303,7 +755,7 @@ export async function getDashboardData() {
     {
       title: "Total Projects",
       value: projects.length,
-      trend: `${projects.filter((item) => item.status === "ongoing").length} ongoing right now`,
+      trend: `${projects.filter((item) => item.status === "Ongoing").length} ongoing right now`,
       href: "/projects",
     },
     {
@@ -364,3 +816,5 @@ export async function getDashboardData() {
     upcomingAppointments,
   };
 }
+
+export { formatProjectLocation };

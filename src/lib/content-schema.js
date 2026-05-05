@@ -7,40 +7,34 @@ export const ENTITY_ORDER = [
   "messages",
 ];
 
+export const PROJECT_STATUSES = ["On Hold", "Ongoing", "Completed"];
+
+export const DEFAULT_PROJECT_CATEGORIES = [
+  { id: "project-category-residential", name: "Residential" },
+  { id: "project-category-commercial", name: "Commercial" },
+  { id: "project-category-industrial", name: "Industrial" },
+];
+
 export const ENTITY_CONFIGS = {
   projects: {
     key: "projects",
     route: "/projects",
     label: "Projects",
     singular: "Project",
-    description: "Manage portfolio entries, case studies, and current studio work.",
+    description: "Manage portfolio entries, categories, galleries, and project storytelling blocks.",
     titleField: "title",
-    descriptionField: "summary",
-    metaFields: ["category", "location", "year"],
+    descriptionField: "description",
+    metaFields: ["category", "status"],
     statusField: "status",
     fields: [
       { name: "title", label: "Project title", type: "text", required: true },
-      {
-        name: "category",
-        label: "Category",
-        type: "select",
-        required: true,
-        options: ["Residential", "Commercial", "Industrial"],
-      },
-      { name: "location", label: "Location", type: "text", required: true },
-      { name: "year", label: "Year", type: "text", required: true },
       {
         name: "status",
         label: "Status",
         type: "select",
         required: true,
-        options: ["Draft", "Ongoing Construction", "Completed", "Published"],
+        options: PROJECT_STATUSES,
       },
-      { name: "image", label: "Cover image URL", type: "text" },
-      { name: "summary", label: "Summary", type: "textarea" },
-      { name: "coordinates", label: "Map Coordinates", type: "text" },
-      { name: "publicVisibility", label: "Public Visibility", type: "boolean" },
-      { name: "gallery", label: "Gallery", type: "json" },
     ],
   },
   vacancies: {

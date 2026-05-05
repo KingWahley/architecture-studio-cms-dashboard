@@ -1,8 +1,9 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState, useSyncExternalStore, useTransition } from "react";
 import Link from "next/link";
-import { LayoutGrid, List, Pencil, Plus, Save, Search, Trash2, X, Upload } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutGrid, List, Pencil, Plus, Save, Search, Trash2, X, Upload } from "lucide-react";
 import { deleteContentItem, saveContentItem, uploadFile } from "@/app/actions/content";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -87,6 +88,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
   const [draft, setDraft] = useState(() => getEmptyValues(config.fields));
   const [mode, setMode] = useState("idle");
   const [feedback, setFeedback] = useState("");
+  const [isMessageListCollapsed, setIsMessageListCollapsed] = useState(false);
   const [isPending, startSaving] = useTransition();
   const viewModeStorageKey = `collection-view:${entityKey}`;
   const viewMode = useSyncExternalStore(
@@ -109,6 +111,15 @@ export default function CollectionManager({ entityKey, config, items, customEdit
 
   const activeItem = useMemo(() => items.find((item) => item.id === activeId) ?? null, [activeId, items]);
   const isCreateMode = mode === "create";
+  const supportsReadOnlyDetailView = config.readOnly && entityKey === "messages";
+  const resolvedReadOnlyActiveItem = useMemo(() => {
+    if (!supportsReadOnlyDetailView) {
+      return null;
+    }
+
+    return filteredItems.find((item) => item.id === activeId) ?? null;
+  }, [activeId, filteredItems, supportsReadOnlyDetailView]);
+  const displayedActiveItem = supportsReadOnlyDetailView ? resolvedReadOnlyActiveItem : activeItem;
 
   useEffect(() => {
     if (!isCreateMode) {
@@ -129,6 +140,11 @@ export default function CollectionManager({ entityKey, config, items, customEdit
   };
 
   const handleSelect = (item) => {
+    if (supportsReadOnlyDetailView) {
+      setActiveId((current) => (current === item.id ? null : item.id));
+      return;
+    }
+
     setActiveId(item.id);
     setDraft(getInitialValues(config.fields, item));
     setMode("edit");
@@ -334,13 +350,16 @@ export default function CollectionManager({ entityKey, config, items, customEdit
   );
 
   const isSplitView = mode === "edit" && !customEditRoute && !config.readOnly;
-  const isGridView = viewMode === "grid";
+  const isReadOnlySplitView = Boolean(supportsReadOnlyDetailView && displayedActiveItem);
+  const isMessageRailMode = supportsReadOnlyDetailView && isMessageListCollapsed && isReadOnlySplitView;
+  const effectiveViewMode = isMessageRailMode ? "list" : viewMode;
+  const isGridView = effectiveViewMode === "grid";
   const itemsLayoutClassName = isGridView
     ? cn(
         "grid gap-4",
-        isSplitView ? "md:grid-cols-2" : "sm:grid-cols-2 xl:grid-cols-3"
+        isSplitView || isReadOnlySplitView ? "md:grid-cols-2" : "sm:grid-cols-2 xl:grid-cols-3"
       )
-    : "space-y-4";
+    : cn("space-y-4", isMessageRailMode && "space-y-3");
 
   return (
     <>
@@ -392,27 +411,61 @@ export default function CollectionManager({ entityKey, config, items, customEdit
 
         <div
           className={cn(
-            "grid gap-6",
-            isSplitView
-              ? "xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]"
-              : "grid-cols-1",
+            "flex flex-col gap-6 xl:flex-row",
+            isSplitView || isReadOnlySplitView ? "xl:items-start" : "",
           )}
         >
+          <motion.div
+            initial={false}
+            animate={{
+              width: isSplitView || isReadOnlySplitView
+                ? isMessageRailMode
+                  ? 96
+                  : 0
+                : 0,
+            }}
+            transition={{ duration: 0.3 }}
+            className={cn(
+              "w-full shrink-0 xl:w-auto",
+              isSplitView || isReadOnlySplitView
+                ? isMessageRailMode
+                  ? "xl:basis-[96px]"
+                  : "xl:basis-[57.5%]"
+                : "xl:basis-full",
+            )}
+          >
           <Card className="overflow-hidden">
             <CardHeader className="border-b border-border-subtle bg-surface-main/80">
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <CardTitle>
-                    <span className="mr-2" >{filteredItems.length}</span>
-
-                    {""}
-                    {config.label}
-                  </CardTitle>
+                {isMessageRailMode ? <div aria-hidden="true" /> : (
+                  <div>
+                    <CardTitle>
+                      <span className="mr-2">{filteredItems.length}</span>
+                      {config.label}
+                    </CardTitle>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  {supportsReadOnlyDetailView && displayedActiveItem ? (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      className="h-9 w-9 rounded-full"
+                      onClick={() => setIsMessageListCollapsed((current) => !current)}
+                      title={isMessageListCollapsed ? "Expand messages list" : "Collapse messages list"}
+                      aria-label={isMessageListCollapsed ? "Expand messages list" : "Collapse messages list"}
+                    >
+                      {isMessageListCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                    </Button>
+                  ) : null}
+                  {!isMessageRailMode ? (
+                    <DisplayModeToggle
+                      mode={viewMode}
+                      onChange={handleViewModeChange}
+                    />
+                  ) : null}
                 </div>
-                <DisplayModeToggle
-                  mode={viewMode}
-                  onChange={handleViewModeChange}
-                />
               </div>
             </CardHeader>
             <CardContent className="p-4">
@@ -425,29 +478,32 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                   {filteredItems.map((item) => {
                     const title = item[config.titleField] || config.singular;
                     const description = item[config.descriptionField];
-                    const isActive = item.id === activeId && mode === "edit";
+                    const isActive = supportsReadOnlyDetailView
+                      ? item.id === displayedActiveItem?.id
+                      : item.id === activeId && mode === "edit";
 
                     const itemContent = (
                       <>
                         <div
                           className={cn(
                             "flex justify-between gap-3",
-                            isGridView ? "items-start" : "items-start",
+                            isMessageRailMode ? "items-center" : "items-start",
                           )}
                         >
                           <div
                             className={cn(
                               "min-w-0 flex-1",
-                              isGridView ? "space-y-4" : "flex gap-4",
+                              isMessageRailMode ? "flex items-center justify-center" : isGridView ? "space-y-4" : "flex gap-4",
                             )}
                           >
-                            {item.image && (
+                            {item.image ? (
                               <div
                                 className={cn(
                                   "overflow-hidden border border-border-subtle bg-surface-alt",
                                   isGridView
                                     ? "aspect-[4/3] w-full rounded-2xl"
                                     : "h-12 w-12 shrink-0 rounded-full",
+                                  isMessageRailMode && "h-12 w-12 rounded-2xl",
                                 )}
                               >
                                 <img
@@ -456,26 +512,32 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                                   className="h-full w-full object-cover"
                                 />
                               </div>
-                            )}
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-lg font-display font-semibold text-on-surface">
-                                {title}
-                              </p>
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                {config.metaFields.map((fieldName) =>
-                                  item[fieldName] ? (
-                                    <span
-                                      key={fieldName}
-                                      className="rounded-full bg-surface-alt px-2.5 py-1 text-xs font-medium text-text-secondary"
-                                    >
-                                      {item[fieldName]}
-                                    </span>
-                                  ) : null,
-                                )}
+                            ) : supportsReadOnlyDetailView ? (
+                              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border-subtle bg-surface-alt text-sm font-semibold text-accent-deep-blue">
+                                {item.name?.charAt(0) ?? title?.charAt(0) ?? "M"}
                               </div>
-                            </div>
+                            ) : null}
+                            {!isMessageRailMode ? (
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-lg font-display font-semibold text-on-surface">
+                                  {title}
+                                </p>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {config.metaFields.map((fieldName) =>
+                                    item[fieldName] ? (
+                                      <span
+                                        key={fieldName}
+                                        className="rounded-full bg-surface-alt px-2.5 py-1 text-xs font-medium text-text-secondary"
+                                      >
+                                        {item[fieldName]}
+                                      </span>
+                                    ) : null,
+                                  )}
+                                </div>
+                              </div>
+                            ) : null}
                           </div>
-                          <div className="flex shrink-0 flex-col items-end gap-3">
+                          <div className={cn("flex shrink-0 flex-col items-end gap-3", isMessageRailMode && "hidden")}>
                             <StatusBadge
                               variant={item[config.statusField] || "draft"}
                             >
@@ -547,7 +609,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                             )}
                           </div>
                         </div>
-                        {description ? (
+                        {description && !isMessageRailMode ? (
                           <p className="mt-3 line-clamp-3 text-sm leading-6 text-text-secondary">
                             {description}
                           </p>
@@ -568,12 +630,13 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                         key={item.id}
                         className={cn(
                           commonClasses,
-                          !customEditRoute &&
-                            !config.readOnly &&
-                            "cursor-pointer",
+                          (!customEditRoute && !config.readOnly) || supportsReadOnlyDetailView
+                            ? "cursor-pointer"
+                            : undefined,
+                          isMessageRailMode && "flex min-h-[76px] items-center justify-center p-3",
                         )}
                         onClick={
-                          !customEditRoute && !config.readOnly
+                          (!customEditRoute && !config.readOnly) || supportsReadOnlyDetailView
                             ? () => handleSelect(item)
                             : undefined
                         }
@@ -586,6 +649,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
               )}
             </CardContent>
           </Card>
+          </motion.div>
 
           {isSplitView && (
             <Card className="h-fit border-accent-deep-blue/20 shadow-architectural">
@@ -627,6 +691,64 @@ export default function CollectionManager({ entityKey, config, items, customEdit
               </CardContent>
             </Card>
           )}
+
+          {isReadOnlySplitView ? (
+            <div className="w-full flex-1">
+            <Card className="overflow-hidden border-accent-deep-blue/20 shadow-architectural">
+              <CardHeader className="border-b border-border-subtle bg-surface-main/80">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex min-w-0 items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border-subtle bg-surface-alt text-lg font-semibold text-accent-deep-blue">
+                      {displayedActiveItem.image ? (
+                        <img src={displayedActiveItem.image} alt={displayedActiveItem.name} className="h-full w-full object-cover" />
+                      ) : (
+                        displayedActiveItem.name?.charAt(0) ?? "M"
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <CardTitle className="truncate text-2xl text-accent-deep-blue">{displayedActiveItem.name}</CardTitle>
+                      <CardDescription className="mt-2 break-words text-base">
+                        {displayedActiveItem.email}
+                        {displayedActiveItem.date ? ` • ${displayedActiveItem.date}` : ""}
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 self-end sm:self-start">
+                    <StatusBadge variant={displayedActiveItem[config.statusField] || "draft"}>
+                      {displayedActiveItem[config.statusField] || "draft"}
+                    </StatusBadge>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setActiveId(null)}
+                      title="Close message details"
+                      aria-label="Close message details"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-6 p-6">
+                <div className="space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-text-secondary">Subject</p>
+                  <h3 className="font-display text-3xl leading-tight text-on-surface">{displayedActiveItem.subject}</h3>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-text-secondary">Message</p>
+                  <div className="rounded-2xl border border-border-subtle bg-white p-5">
+                    <p className="whitespace-pre-line text-base leading-8 text-on-surface">
+                      {displayedActiveItem.body || displayedActiveItem.preview || "No message body available."}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            </div>
+          ) : null}
         </div>
       </div>
 
