@@ -12,6 +12,7 @@ import {
   MessageSquare, 
   Calendar, 
   BookOpen, 
+  Images,
   Settings,
   ChevronLeft,
   ChevronRight
@@ -20,12 +21,13 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Appointments", href: "/appointments", icon: Calendar },
+  { name: "Contact", href: "/messages", icon: MessageSquare },
   { name: "Projects", href: "/projects", icon: FolderKanban },
   { name: "Team", href: "/team", icon: Users },
-  { name: "Vacancies", href: "/vacancies", icon: Briefcase },
-  { name: "Messages", href: "/messages", icon: MessageSquare },
-  { name: "Appointments", href: "/appointments", icon: Calendar },
   { name: "Blog Posts", href: "/blog", icon: BookOpen },
+  { name: "Careers", href: "/vacancies", icon: Briefcase },
+  { name: "Media Library", href: "/media", icon: Images },
 ];
 
 export default function Sidebar() {

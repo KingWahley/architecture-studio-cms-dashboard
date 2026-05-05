@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   Eye,
   GripVertical,
+  ImagePlus,
   LoaderCircle,
   Plus,
   Save,
@@ -24,6 +25,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
+import MediaLibraryPickerModal from "@/components/media/MediaLibraryPickerModal";
 import { PROJECT_STATUSES } from "@/lib/content-schema";
 import { cn } from "@/lib/utils";
 import RichTextEditor from "./RichTextEditor";
@@ -112,7 +114,7 @@ function stripHtml(value) {
     .trim();
 }
 
-export default function ProjectForm({ project, categories }) {
+export default function ProjectForm({ project, categories, mediaItems }) {
   const router = useRouter();
   const fileInputRef = useRef(null);
   const [draft, setDraft] = useState(() => normalizeProject(project));
@@ -124,6 +126,7 @@ export default function ProjectForm({ project, categories }) {
   const [isUploading, setIsUploading] = useState(false);
   const [draggedGalleryId, setDraggedGalleryId] = useState(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [categoryDraft, setCategoryDraft] = useState({ id: null, name: "" });
   const [categoryError, setCategoryError] = useState("");
@@ -229,6 +232,48 @@ export default function ProjectForm({ project, categories }) {
         fileInputRef.current.value = "";
       }
     }
+  };
+
+  const handleSelectMediaItems = (selectedItems) => {
+    const chosenItems = Array.isArray(selectedItems) ? selectedItems : [];
+
+    if (chosenItems.length === 0) {
+      setIsMediaPickerOpen(false);
+      return;
+    }
+
+    let addedCount = 0;
+
+    setDraft((current) => {
+      const existingUrls = new Set(current.gallery.map((item) => item.url));
+      const nextGallery = [...current.gallery];
+
+      for (const item of chosenItems) {
+        if (existingUrls.has(item.url)) {
+          continue;
+        }
+
+        existingUrls.add(item.url);
+        addedCount += 1;
+        nextGallery.push({
+          id: `gallery-${crypto.randomUUID()}`,
+          url: item.url,
+          alt: item.alt || item.name.replace(/\.[^.]+$/, ""),
+        });
+      }
+
+      return {
+        ...current,
+        gallery: nextGallery,
+      };
+    });
+
+    setFeedback(
+      addedCount > 0
+        ? `${addedCount} image${addedCount === 1 ? "" : "s"} added from the media library.`
+        : "Those images are already in the gallery.",
+    );
+    setIsMediaPickerOpen(false);
   };
 
   const handleSave = () => {
@@ -586,6 +631,16 @@ export default function ProjectForm({ project, categories }) {
                   <div className="flex gap-3">
                     <Button
                       type="button"
+                      variant="secondary"
+                      onClick={() => setIsMediaPickerOpen(true)}
+                      className="gap-2"
+                      disabled={mediaItems.length === 0}
+                    >
+                      <ImagePlus size={16} />
+                      Choose from Library
+                    </Button>
+                    <Button
+                      type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploading}
                       className="gap-2"
@@ -906,6 +961,21 @@ export default function ProjectForm({ project, categories }) {
           </Card>
         </div>
       ) : null}
+      <MediaLibraryPickerModal
+        key={`project-media-picker-${isMediaPickerOpen ? "open" : "closed"}-${draft.gallery.length}`}
+        open={isMediaPickerOpen}
+        items={mediaItems}
+        onClose={() => setIsMediaPickerOpen(false)}
+        onSelect={handleSelectMediaItems}
+        multiple
+        initialSelectedIds={
+          draft.gallery
+            .map((galleryItem) => mediaItems.find((item) => item.url === galleryItem.url)?.id)
+            .filter(Boolean)
+        }
+        title="Choose Project Gallery Images"
+        description="Select one or more existing media assets to add to this project gallery."
+      />
     </>
   );
 }

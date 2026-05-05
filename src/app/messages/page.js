@@ -1,5 +1,7 @@
-import CollectionPage from "@/components/admin/CollectionPage";
+import ContactAdminPage from "@/components/contact/ContactAdminPage";
+import { getContactBundle } from "@/lib/content-store";
 
-export default function MessagesPage() {
-  return <CollectionPage entityKey="messages" />;
+export default async function MessagesPage() {
+  const { contactDetails, messages } = await getContactBundle();
+  return <ContactAdminPage initialContactDetails={contactDetails} initialMessages={messages} />;
 }

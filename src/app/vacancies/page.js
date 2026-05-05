@@ -1,5 +1,7 @@
-import CollectionPage from "@/components/admin/CollectionPage";
+import CareersAdminPage from "@/components/careers/CareersAdminPage";
+import { getCareersBundle } from "@/lib/content-store";
 
-export default function VacanciesPage() {
-  return <CollectionPage entityKey="vacancies" />;
+export default async function VacanciesPage() {
+  const { vacancies, applications } = await getCareersBundle();
+  return <CareersAdminPage initialVacancies={vacancies} initialApplications={applications} />;
 }

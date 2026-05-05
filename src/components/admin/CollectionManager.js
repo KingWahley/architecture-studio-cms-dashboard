@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore, useTransition } fro
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, LayoutGrid, List, Pencil, Plus, Save, Search, Trash2, X, Upload } from "lucide-react";
 import { deleteContentItem, saveContentItem, uploadFile } from "@/app/actions/content";
+import MediaLibraryPickerModal from "@/components/media/MediaLibraryPickerModal";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -59,7 +60,7 @@ function DisplayModeToggle({ mode, onChange }) {
         onClick={() => onChange("grid")}
         className={cn(
           "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-          mode === "grid" ? "bg-accent-deep-blue text-white shadow-sm" : "text-text-secondary hover:bg-white"
+          mode === "grid" ? "bg-accent-deep-blue text-white shadow-sm" : "text-text-secondary hover:bg-surface-main"
         )}
         aria-pressed={mode === "grid"}
         title="Grid view"
@@ -71,7 +72,7 @@ function DisplayModeToggle({ mode, onChange }) {
         onClick={() => onChange("list")}
         className={cn(
           "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-          mode === "list" ? "bg-accent-deep-blue text-white shadow-sm" : "text-text-secondary hover:bg-white"
+          mode === "list" ? "bg-accent-deep-blue text-white shadow-sm" : "text-text-secondary hover:bg-surface-main"
         )}
         aria-pressed={mode === "list"}
         title="List view"
@@ -82,12 +83,13 @@ function DisplayModeToggle({ mode, onChange }) {
   );
 }
 
-export default function CollectionManager({ entityKey, config, items, customEditRoute }) {
+export default function CollectionManager({ entityKey, config, items, mediaItems, customEditRoute }) {
   const [query, setQuery] = useState("");
   const [activeId, setActiveId] = useState(null);
   const [draft, setDraft] = useState(() => getEmptyValues(config.fields));
   const [mode, setMode] = useState("idle");
   const [feedback, setFeedback] = useState("");
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
   const [isMessageListCollapsed, setIsMessageListCollapsed] = useState(false);
   const [isPending, startSaving] = useTransition();
   const viewModeStorageKey = `collection-view:${entityKey}`;
@@ -262,6 +264,15 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                 disabled={config.readOnly}
               />
             </label>
+            <Button
+              type="button"
+              variant="secondary"
+              className="h-11"
+              onClick={() => setIsMediaPickerOpen(true)}
+              disabled={config.readOnly || mediaItems.length === 0}
+            >
+              Choose
+            </Button>
           </div>
         </div>
       )}
@@ -622,7 +633,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                       isGridView && "h-full",
                       isActive
                         ? "border-accent-deep-blue bg-accent-deep-blue/[0.06] shadow-architectural"
-                        : "border-border-subtle bg-white hover:border-accent-deep-blue/40 hover:bg-surface-alt",
+                        : "border-border-subtle bg-surface-main hover:border-accent-deep-blue/40 hover:bg-surface-alt",
                     );
 
                     return (
@@ -739,7 +750,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
 
                 <div className="space-y-3">
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-text-secondary">Message</p>
-                  <div className="rounded-2xl border border-border-subtle bg-white p-5">
+                  <div className="rounded-2xl border border-border-subtle bg-surface-main p-5">
                     <p className="whitespace-pre-line text-base leading-8 text-on-surface">
                       {displayedActiveItem.body || displayedActiveItem.preview || "No message body available."}
                     </p>
@@ -791,6 +802,27 @@ export default function CollectionManager({ entityKey, config, items, customEdit
           </div>
         </div>
       ) : null}
+
+      <MediaLibraryPickerModal
+        key={`collection-media-picker-${isMediaPickerOpen ? "open" : "closed"}-${draft.image || "empty"}`}
+        open={isMediaPickerOpen}
+        items={mediaItems}
+        onClose={() => setIsMediaPickerOpen(false)}
+        onSelect={(item) => {
+          if (item?.url) {
+            handleChange("image", item.url);
+            setFeedback("Image selected from media library.");
+          }
+          setIsMediaPickerOpen(false);
+        }}
+        initialSelectedIds={
+          draft.image
+            ? mediaItems.filter((item) => item.url === draft.image).map((item) => item.id)
+            : []
+        }
+        title="Choose Image from Media Library"
+        description="Reuse an existing image instead of uploading another copy."
+      />
     </>
   );
 }
