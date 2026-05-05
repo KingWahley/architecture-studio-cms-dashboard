@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Briefcase, Building2, Calendar, FileText, MessageSquare, Plus } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Briefcase, Building2, Calendar, MessageSquare, Plus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { getDashboardData } from "@/lib/content-store";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export default async function DashboardPage() {
           const Icon = ICONS[index] ?? Building2;
 
           return (
-            <Card key={stat.title} className="group border-border-subtle/50 shadow-sm overflow-hidden hover:border-secondary-fixed hover:shadow-architectural transition-all duration-300">
+            <Card key={stat.title} className="group overflow-hidden border-border-subtle/50 shadow-sm transition-all duration-300 hover:border-secondary-fixed hover:shadow-architectural">
               <Link href={stat.href || "#"}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
@@ -25,7 +25,7 @@ export default async function DashboardPage() {
                       <Icon size={20} className="text-on-secondary-fixed-variant" strokeWidth={1.5} />
                     </div>
                     <div className="flex flex-col">
-                      <p className="text-md font-medium text-text-secondary group-hover:text-on-surface transition-colors">{stat.title}</p>
+                      <p className="text-md font-medium text-text-secondary transition-colors group-hover:text-on-surface">{stat.title}</p>
                       <div className="text-xl font-display font-bold text-on-surface">{stat.value}</div>
                     </div>
                   </div>
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Calendar size={12} />
-                          <span>{new Date(msg.updatedAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                          <span>{msg.updatedAt ? new Date(msg.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}</span>
                         </div>
                       </div>
                     </div>

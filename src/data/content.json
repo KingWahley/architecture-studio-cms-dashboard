@@ -115,6 +115,7 @@
       "email": "alex@pieach.com",
       "phone": "+234 800 123 4567",
       "status": "active",
+      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
       "bio": "Leads studio direction, key client relationships, and final design approvals.",
       "updatedAt": "2026-04-29T09:00:00.000Z"
     },
@@ -125,18 +126,9 @@
       "email": "sophia@pieach.com",
       "phone": "+234 800 234 5678",
       "status": "active",
+      "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
       "bio": "Owns interior concept development and material storytelling across premium projects.",
       "updatedAt": "2026-04-24T10:00:00.000Z"
-    },
-    {
-      "id": "team-3",
-      "name": "Michael Obi",
-      "role": "Project Manager",
-      "email": "michael@pieach.com",
-      "phone": "+234 800 345 6789",
-      "status": "ongoing",
-      "bio": "Coordinates delivery milestones, reporting, and cross-functional execution.",
-      "updatedAt": "2026-04-21T14:00:00.000Z"
     }
   ],
   "applications": [

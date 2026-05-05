@@ -402,12 +402,14 @@ export default function CollectionManager({ entityKey, config, items, customEdit
             <CardHeader className="border-b border-border-subtle bg-surface-main/80">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <CardTitle>
-                    <span className="mr-2" >{filteredItems.length}</span>
-
-                    {""}
-                    {config.label}
-                  </CardTitle>
+                  <CardTitle>{config.label}</CardTitle>
+                  <CardDescription>
+                    {filteredItems.length}{" "}
+                    {filteredItems.length === 1
+                      ? `${config.label}`
+                      : `${config.label}`
+                    shown
+                  </CardDescription>
                 </div>
                 <DisplayModeToggle
                   mode={viewMode}

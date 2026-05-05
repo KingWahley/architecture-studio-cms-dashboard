@@ -403,7 +403,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <CardTitle>
-                    <span className="mr-2" >{filteredItems.length}</span>
+                    <span class >{filteredItems.length}</span>
 
                     {""}
                     {config.label}

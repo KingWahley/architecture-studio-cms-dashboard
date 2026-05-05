@@ -344,27 +344,16 @@ export default function CollectionManager({ entityKey, config, items, customEdit
 
   return (
     <>
-      <div
-        className={cn(
-          "space-y-6 transition-all",
-          isCreateMode && "pointer-events-none select-none blur-sm opacity-20",
-        )}
-      >
+      <div className={cn("space-y-6 transition-all", isCreateMode && "pointer-events-none select-none blur-sm opacity-20")}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-3xl font-display font-semibold text-accent-deep-blue">
-              {config.label}
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm text-text-secondary">
-              {config.description}
-            </p>
+           
+            <h2 className="text-3xl font-display font-semibold text-accent-deep-blue">{config.label}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-text-secondary">{config.description}</p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-stretch">
             <div className="relative min-w-0 sm:min-w-72">
-              <Search
-                size={18}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary"
-              />
+              <Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" />
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
@@ -372,12 +361,9 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                 className="h-11 pl-11 pr-4 leading-none"
               />
             </div>
-            {!config.readOnly &&
-              (customEditRoute ? (
-                <Link
-                  href={customEditRoute.replace("[id]", "new")}
-                  className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-accent-deep-blue px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-accent-deep-blue/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-deep-blue disabled:pointer-events-none disabled:opacity-50"
-                >
+            {!config.readOnly && (
+              customEditRoute ? (
+                <Link href={customEditRoute.replace('[id]', 'new')} className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-accent-deep-blue px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-accent-deep-blue/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-deep-blue disabled:pointer-events-none disabled:opacity-50">
                   <Plus size={16} />
                   New {config.singular}
                 </Link>
@@ -386,33 +372,22 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                   <Plus size={16} />
                   New {config.singular}
                 </Button>
-              ))}
+              )
+            )}
           </div>
         </div>
 
-        <div
-          className={cn(
-            "grid gap-6",
-            isSplitView
-              ? "xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]"
-              : "grid-cols-1",
-          )}
-        >
+        <div className={cn("grid gap-6", isSplitView ? "xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]" : "grid-cols-1")}>
           <Card className="overflow-hidden">
             <CardHeader className="border-b border-border-subtle bg-surface-main/80">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <CardTitle>
-                    <span className="mr-2" >{filteredItems.length}</span>
-
-                    {""}
-                    {config.label}
-                  </CardTitle>
+                  <CardTitle>{config.label}</CardTitle>
+                  <CardDescription>
+                    {filteredItems.length} {filteredItems.length === 1 ? "item" : "items"} shown
+                  </CardDescription>
                 </div>
-                <DisplayModeToggle
-                  mode={viewMode}
-                  onChange={handleViewModeChange}
-                />
+                <DisplayModeToggle mode={viewMode} onChange={handleViewModeChange} />
               </div>
             </CardHeader>
             <CardContent className="p-4">
@@ -429,38 +404,20 @@ export default function CollectionManager({ entityKey, config, items, customEdit
 
                     const itemContent = (
                       <>
-                        <div
-                          className={cn(
-                            "flex justify-between gap-3",
-                            isGridView ? "items-start" : "items-start",
-                          )}
-                        >
-                          <div
-                            className={cn(
-                              "min-w-0 flex-1",
-                              isGridView ? "space-y-4" : "flex gap-4",
-                            )}
-                          >
+                        <div className={cn("flex justify-between gap-3", isGridView ? "items-start" : "items-start")}>
+                          <div className={cn("min-w-0 flex-1", isGridView ? "space-y-4" : "flex gap-4")}>
                             {item.image && (
                               <div
                                 className={cn(
                                   "overflow-hidden border border-border-subtle bg-surface-alt",
-                                  isGridView
-                                    ? "aspect-[4/3] w-full rounded-2xl"
-                                    : "h-12 w-12 shrink-0 rounded-full",
+                                  isGridView ? "aspect-[4/3] w-full rounded-2xl" : "h-12 w-12 shrink-0 rounded-full"
                                 )}
                               >
-                                <img
-                                  src={item.image}
-                                  alt={title}
-                                  className="h-full w-full object-cover"
-                                />
+                                <img src={item.image} alt={title} className="h-full w-full object-cover" />
                               </div>
                             )}
                             <div className="min-w-0 flex-1">
-                              <p className="truncate text-lg font-display font-semibold text-on-surface">
-                                {title}
-                              </p>
+                              <p className="truncate text-lg font-display font-semibold text-on-surface">{title}</p>
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {config.metaFields.map((fieldName) =>
                                   item[fieldName] ? (
@@ -470,15 +427,13 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                                     >
                                       {item[fieldName]}
                                     </span>
-                                  ) : null,
+                                  ) : null
                                 )}
                               </div>
                             </div>
                           </div>
                           <div className="flex shrink-0 flex-col items-end gap-3">
-                            <StatusBadge
-                              variant={item[config.statusField] || "draft"}
-                            >
+                            <StatusBadge variant={item[config.statusField] || "draft"}>
                               {item[config.statusField] || "draft"}
                             </StatusBadge>
                             {!config.readOnly && (
@@ -491,16 +446,8 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                                     asChild
                                     title="Edit"
                                   >
-                                    <Link
-                                      href={customEditRoute.replace(
-                                        "[id]",
-                                        item.id,
-                                      )}
-                                    >
-                                      <Pencil
-                                        size={14}
-                                        className="text-accent-deep-blue"
-                                      />
+                                    <Link href={customEditRoute.replace("[id]", item.id)}>
+                                      <Pencil size={14} className="text-accent-deep-blue" />
                                     </Link>
                                   </Button>
                                 ) : (
@@ -514,10 +461,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                                     }}
                                     title="Edit"
                                   >
-                                    <Pencil
-                                      size={14}
-                                      className="text-accent-deep-blue"
-                                    />
+                                    <Pencil size={14} className="text-accent-deep-blue" />
                                   </Button>
                                 )}
                                 <Button
@@ -528,10 +472,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                                     e.stopPropagation();
                                     if (window.confirm(`Delete ${title}?`)) {
                                       startSaving(async () => {
-                                        await deleteContentItem({
-                                          entityKey,
-                                          id: item.id,
-                                        });
+                                        await deleteContentItem({ entityKey, id: item.id });
                                         if (activeId === item.id) {
                                           setActiveId(null);
                                           setMode("idle");
@@ -548,9 +489,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                           </div>
                         </div>
                         {description ? (
-                          <p className="mt-3 line-clamp-3 text-sm leading-6 text-text-secondary">
-                            {description}
-                          </p>
+                          <p className="mt-3 line-clamp-3 text-sm leading-6 text-text-secondary">{description}</p>
                         ) : null}
                       </>
                     );
@@ -560,23 +499,14 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                       isGridView && "h-full",
                       isActive
                         ? "border-accent-deep-blue bg-accent-deep-blue/[0.06] shadow-architectural"
-                        : "border-border-subtle bg-white hover:border-accent-deep-blue/40 hover:bg-surface-alt",
+                        : "border-border-subtle bg-white hover:border-accent-deep-blue/40 hover:bg-surface-alt"
                     );
 
                     return (
                       <div
                         key={item.id}
-                        className={cn(
-                          commonClasses,
-                          !customEditRoute &&
-                            !config.readOnly &&
-                            "cursor-pointer",
-                        )}
-                        onClick={
-                          !customEditRoute && !config.readOnly
-                            ? () => handleSelect(item)
-                            : undefined
-                        }
+                        className={cn(commonClasses, !customEditRoute && !config.readOnly && "cursor-pointer")}
+                        onClick={!customEditRoute && !config.readOnly ? () => handleSelect(item) : undefined}
                       >
                         {itemContent}
                       </div>
@@ -586,7 +516,7 @@ export default function CollectionManager({ entityKey, config, items, customEdit
               )}
             </CardContent>
           </Card>
-
+ 
           {isSplitView && (
             <Card className="h-fit border-accent-deep-blue/20 shadow-architectural">
               <CardHeader className="border-b border-border-subtle bg-surface-main/80">
@@ -597,26 +527,17 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                       Update details and save changes instantly.
                     </CardDescription>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setMode("idle")}
-                    title="Close editor"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setMode("idle")} title="Close editor">
                     <X size={16} />
                   </Button>
                 </div>
               </CardHeader>
-
+ 
               <CardContent className="p-6">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {formContent}
                   <div className="pt-4 flex items-center justify-end gap-3 border-t border-border-subtle">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setMode("idle")}
-                    >
+                    <Button type="button" variant="ghost" onClick={() => setMode("idle")}>
                       Cancel
                     </Button>
                     <Button type="submit" disabled={isPending}>
@@ -641,20 +562,12 @@ export default function CollectionManager({ entityKey, config, items, customEdit
                       <Plus size={12} />
                       New {config.singular}
                     </div>
-                    <CardTitle className="text-2xl text-accent-deep-blue">
-                      Create {config.singular}
-                    </CardTitle>
+                    <CardTitle className="text-2xl text-accent-deep-blue">Create {config.singular}</CardTitle>
                     <CardDescription className="mt-2 max-w-2xl">
-                      Add a new {config.singular.toLowerCase()} with a focused
-                      full-screen form.
+                      Add a new {config.singular.toLowerCase()} with a focused full-screen form.
                     </CardDescription>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleCloseCreate}
-                    title="Close create form"
-                  >
+                  <Button variant="ghost" size="icon" onClick={handleCloseCreate} title="Close create form">
                     <X size={18} />
                   </Button>
                 </div>
