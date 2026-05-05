@@ -17,6 +17,8 @@ import {
 import { Textarea } from "@/components/ui/Textarea";
 import { cn } from "@/lib/utils";
 
+const PAGE_SIZE = 8;
+
 function formatDateTime(value) {
   if (!value) {
     return "Not available";
@@ -98,6 +100,7 @@ export default function ContactAdminPage({ initialContactDetails, initialMessage
   const [contactDetails, setContactDetails] = useState(() => normalizeContactDetails(initialContactDetails));
   const [messages, setMessages] = useState(initialMessages);
   const [query, setQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [isPending, startTransition] = useTransition();
@@ -115,6 +118,13 @@ export default function ContactAdminPage({ initialContactDetails, initialMessage
         .some((value) => value.toLowerCase().includes(normalizedQuery)),
     );
   }, [messages, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredMessages.length / PAGE_SIZE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedMessages = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * PAGE_SIZE;
+    return filteredMessages.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredMessages, safeCurrentPage]);
 
   const stats = useMemo(() => {
     return [
@@ -465,7 +475,10 @@ export default function ContactAdminPage({ initialContactDetails, initialMessage
                   />
                   <Input
                     value={query}
-                    onChange={(event) => setQuery(event.target.value)}
+                    onChange={(event) => {
+                      setQuery(event.target.value);
+                      setCurrentPage(1);
+                    }}
                     placeholder="Search messages"
                     className="h-11 pl-11"
                   />
@@ -479,63 +492,93 @@ export default function ContactAdminPage({ initialContactDetails, initialMessage
                   No messages matched your search.
                 </div>
               ) : (
-                <Table className="min-w-[980px]">
-                  <TableHeader>
-                    <TableRow className="bg-surface-alt/50 hover:bg-surface-alt/50">
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone Number</TableHead>
-                      <TableHead>Subject</TableHead>
-                      <TableHead>Message</TableHead>
-                      <TableHead>Date Submitted</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredMessages.map((message) => (
-                      <TableRow
-                        key={message.id}
-                        className={cn(message.status === "new" && "bg-accent-deep-blue/[0.04]")}
-                      >
-                        <TableCell className="font-medium text-on-surface">{message.name}</TableCell>
-                        <TableCell>{message.email || "Not provided"}</TableCell>
-                        <TableCell>{message.phone || "Not provided"}</TableCell>
-                        <TableCell>{message.subject || "No subject"}</TableCell>
-                        <TableCell>
-                          <div className="max-w-[280px] truncate text-text-secondary">
-                            {message.preview || message.body || "No message content"}
-                          </div>
-                        </TableCell>
-                        <TableCell>{message.date || formatDateTime(message.updatedAt)}</TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="gap-2"
-                              onClick={() => setSelectedMessage(message)}
-                            >
-                              <Eye size={14} />
-                              View
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="gap-2 text-error hover:bg-error/10 hover:text-error"
-                              onClick={() => handleDeleteMessage(message)}
-                              disabled={isPending}
-                            >
-                              <Trash2 size={14} />
-                              Delete
-                            </Button>
-                          </div>
-                        </TableCell>
+                <>
+                  <Table className="min-w-[980px]">
+                    <TableHeader>
+                      <TableRow className="bg-surface-alt/50 hover:bg-surface-alt/50">
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone Number</TableHead>
+                        <TableHead>Subject</TableHead>
+                        <TableHead>Message</TableHead>
+                        <TableHead>Date Submitted</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedMessages.map((message) => (
+                        <TableRow
+                          key={message.id}
+                          className={cn(message.status === "new" && "bg-accent-deep-blue/[0.04]")}
+                        >
+                          <TableCell className="font-medium text-on-surface">{message.name}</TableCell>
+                          <TableCell>{message.email || "Not provided"}</TableCell>
+                          <TableCell>{message.phone || "Not provided"}</TableCell>
+                          <TableCell>{message.subject || "No subject"}</TableCell>
+                          <TableCell>
+                            <div className="max-w-[280px] truncate text-text-secondary">
+                              {message.preview || message.body || "No message content"}
+                            </div>
+                          </TableCell>
+                          <TableCell>{message.date || formatDateTime(message.updatedAt)}</TableCell>
+                          <TableCell>
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="gap-2"
+                                onClick={() => setSelectedMessage(message)}
+                              >
+                                <Eye size={14} />
+                                View
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="gap-2 text-error hover:bg-error/10 hover:text-error"
+                                onClick={() => handleDeleteMessage(message)}
+                                disabled={isPending}
+                              >
+                                <Trash2 size={14} />
+                                Delete
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+
+                  <div className="flex flex-col gap-4 border-t border-border-subtle px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-text-secondary">
+                      Showing {paginatedMessages.length === 0 ? 0 : (safeCurrentPage - 1) * PAGE_SIZE + 1}
+                      {" - "}
+                      {(safeCurrentPage - 1) * PAGE_SIZE + paginatedMessages.length} of {filteredMessages.length} messages
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="secondary"
+                        onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                        disabled={safeCurrentPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      <div className="rounded-xl border border-border-subtle px-4 py-2 text-sm text-text-secondary">
+                        Page {safeCurrentPage} of {totalPages}
+                      </div>
+                      <Button
+                        variant="secondary"
+                        onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                        disabled={safeCurrentPage === totalPages}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

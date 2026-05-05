@@ -14,9 +14,8 @@ const manrope = Manrope({
 });
 
 export const metadata = {
-  title: "Pieach Studio CMS",
-  // description:
-  //   "Admin dashboard and content management portal for Pieach Architecture.",
+  title: "Architectural Studio CMS",
+  description: "Admin dashboard and content management portal for architectural projects.",
 };
 
 export default function RootLayout({ children }) {
